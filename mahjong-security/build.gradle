@@ -1,13 +1,13 @@
-import org.flywaydb.core.Flyway
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
+import org.flywaydb.core.Flyway
 
 apply plugin: 'idea'
 apply plugin: "com.github.johnrengelman.shadow"
 apply plugin: 'nebula.ospackage'
 
 dependencies {
-    compile project (':mahjong-application')
-    compile project (':mahjong-security-api')
+    compile project(':mahjong-application')
+    compile project(':mahjong-security-api')
 
     compileOnly('org.projectlombok:lombok:1.16.20')
     compile 'org.springframework:spring-beans:4.3.7.RELEASE'
@@ -128,44 +128,40 @@ ospackage {
     release = 1
     os = LINUX
     type = BINARY
-    arch = NOARCH
 
     preInstall file("deb/preInstall.sh")
     postInstall file("deb/postInstall.sh")
     preUninstall file("deb/preUninstall.sh")
     postUninstall file("deb/postUninstall.sh")
 
-    into "/"
     user "mahjong-security"
     permissionGroup "mahjong-security"
 
-    // Copy the actual .jar file
-    from(jar.outputs.files) {
-        // Strip the version from the jar filename
-        rename { String fileName ->
-            fileName.replace("-${project.version}", "")
+    into("/usr/lib/mahjong-security") {
+        // Copy the actual .jar file
+        from(jar.outputs.files) {
         }
-        fileMode 0500
-        into "bin"
+        from(configurations.testRuntime) {
+        }
     }
-
-    from(configurations.testRuntime) {
-        into "lib"
+    into("/usr/lib/systemd/system/") {
+        from "deb/mahjong-security.service"
     }
-
-    // Copy the config files
-//    from("install/unix/conf") {
-//        fileType CONFIG | NOREPLACE
-//        fileMode 0754
-//        into "conf"
-//    }
+    into("/usr/bin/") {
+        from "deb/mahjong-security.sh"
+        fileMode 0755
+    }
+    into("/etc/mahjong-security/") {
+        from "deb/db-init.sh"
+        fileMode 0755
+    }
 }
 
 // Same as the buildRpm task
 buildDeb {
     user "mahjong-security"
     permissionGroup "mahjong-security"
-    directory("/opt/local/mahjong-security/log", 0755)
-    link("/etc/init.d/mahjong-security", "/opt/local/mahjong-security/bin/daemon-demo.jar")
-//    link("/opt/local/mahjong-security/bin/daemon-demo.conf", "/opt/local/daemon-demo/conf/daemon-demo.conf")
+    directory("/var/log/mahjong-security", 0755)
+    directory("/etc/mahjong-security/", 0755)
+    directory("/var/run/mahjong-security/", 0755)
 }

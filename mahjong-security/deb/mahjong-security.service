@@ -7,7 +7,7 @@ Requires=postgresql.service
 
 [Service]
 Type=forking
-PIDFile=/etc/mahjong-security/mahjong-security.pid
+PIDFile=/var/run/mahjong-security/mahjong-security.pid
 WorkingDirectory=/etc/mahjong-security
 
 User=mahjong-security
@@ -15,9 +15,9 @@ Group=mahjong-security
 
 OOMScoreAdjust=-1000
 
-ExecStart=/usr/bin/mahjong-security.sh --start
-ExecStop=/usr/bin/mahjong-security.sh --stop
-ExecReload=/usr/bin/mahjong-security.sh --restart
+ExecStart=/usr/bin/mahjong-security.sh start
+ExecStop=/usr/bin/mahjong-security.sh stop
+ExecReload=/usr/bin/mahjong-security.sh restart
 TimeoutSec=300
 
 [Install]
