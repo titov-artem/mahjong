@@ -1,0 +1,51 @@
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button #menuToggle type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-navbar" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" routerLink="/">Mahjong</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-navbar">
+            <ul *ngIf="authenticated" class="nav navbar-nav">
+                <li [routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact: true}"
+                    (click)="toggleMenu(menuToggle)">
+                    <a routerLink="/games">Games</a>
+                </li>
+                <li [routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact: true}"
+                    (click)="toggleMenu(menuToggle)">
+                    <a routerLink="/leagues">Leagues</a>
+                </li>
+                <li [routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact: true}"
+                    (click)="toggleMenu(menuToggle)">
+                    <a routerLink="/leagues/invitations">Invitations</a>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li *ngIf="authenticated && player != null" class="navbar-text">
+                    <span routerLink="/profile" style="cursor: pointer"><span class="glyphicon glyphicon-user"></span> {{player.name}}</span>
+                </li>
+                <li *ngIf="!authenticated">
+                    <p class="navbar-btn">
+                        <a routerLink="/signin" class="btn btn-primary">Sign in</a>
+                    </p>
+                </li>
+                <li *ngIf="authenticated">
+                    <p class="navbar-btn">
+                        <a (click)="signOut()" class="btn btn-primary">Sign out</a>
+                    </p>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container">
+    <router-outlet></router-outlet>
+    <alert></alert>
+</div>

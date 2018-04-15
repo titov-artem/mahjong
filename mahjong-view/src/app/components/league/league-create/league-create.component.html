@@ -1,0 +1,11 @@
+<form #leagueCreateForm="ngForm" (ngSubmit)="create(leagueCreateForm)">
+    <div class="form-group">
+        <label for="name_EN">Name (EN)</label>
+        <input ngModel name="name_EN" type="text" class="form-control" id="name_EN" placeholder="Name (EN)">
+    </div>
+    <div class="form-group">
+        <label for="description_EN">Description (EN)</label>
+        <textarea ngModel name="description_EN" type="text" class="form-control" id="description_EN" placeholder="Description (EN)"></textarea>
+    </div>
+    <button type="submit" class="btn btn-default">Create</button>
+</form>

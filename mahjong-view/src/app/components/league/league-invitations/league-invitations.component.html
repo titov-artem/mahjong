@@ -1,0 +1,9 @@
+<ul class="list-group">
+    <li *ngFor="let invitation of invitations" class="list-group-item clearfix">
+        Player {{invitation.author.name}} invites you to join league {{invitation.leagueName}}
+        <div class="pull-right">
+            <div class="btn btn-primary" (click)="accept(invitation)">Accept</div>
+            <div class="btn btn-default" (click)="reject(invitation)">Reject</div>
+        </div>
+    </li>
+</ul>

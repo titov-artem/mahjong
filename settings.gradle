@@ -1,0 +1,12 @@
+rootProject.name = 'mahjong'
+
+include ':mahjong-common'
+include ':mahjong-api-common'
+include ':mahjong-security'
+include ':mahjong-security-api'
+include ':mahjong-main'
+include ':mahjong-main-public-api'
+include ':mahjong-main-private-api'
+include ':mahjong-league'
+include ':mahjong-view'
+include ':mahjong-application'

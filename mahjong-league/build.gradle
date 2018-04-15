@@ -1,0 +1,144 @@
+import org.flywaydb.core.Flyway
+import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
+
+apply plugin: 'idea'
+apply plugin: "com.github.johnrengelman.shadow"
+
+dependencies {
+    compile project (':mahjong-application')
+    compile project (':mahjong-api-common')
+    compile project (':mahjong-main-public-api')
+    compile project (':mahjong-main-private-api')
+
+    compileOnly('org.projectlombok:lombok:1.16.20')
+    compile 'org.springframework:spring-beans:4.3.7.RELEASE'
+
+    // database
+    compile 'org.springframework:spring-jdbc:4.3.7.RELEASE'
+    compile 'com.zaxxer:HikariCP:2.6.1'
+    compile 'org.flywaydb:flyway-core:4.1.2'
+    compile 'org.postgresql:postgresql:42.0.0'
+
+    // testing
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.codehaus.groovy:groovy-all:2.4.3'
+    testCompile 'org.spockframework:spock-unitils:1.0-groovy-2.4'
+    testCompile 'org.mockito:mockito-core:1.10.19'
+    testCompile 'org.slf4j:jcl-over-slf4j:1.7.12'
+    testCompile 'org.springframework:spring-test:4.3.7.RELEASE'
+    testCompile 'org.spockframework:spock-spring:1.0-groovy-2.4'
+    testCompile 'ch.qos.logback:logback-classic:1.1.2'
+}
+
+buildscript {
+    repositories {
+        mavenLocal()
+        jcenter()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'org.jooq:jooq-codegen:3.10.5'
+        classpath 'org.postgresql:postgresql:42.0.0'
+        classpath 'org.flywaydb:flyway-core:4.1.2'
+        classpath "com.github.jengelman.gradle.plugins:shadow:1.2.4"
+    }
+}
+
+sourceSets {
+    main {
+        java.srcDirs += "$project.projectDir/src/main/generated/"
+    }
+}
+
+idea {
+    module {
+        generatedSourceDirs += file("$project.projectDir/src/main/generated/")
+    }
+}
+
+task generate {
+
+    doLast {
+        // Use your favourite XML builder to construct the code generation configuration file
+        // ----------------------------------------------------------------------------------
+        def writer = new StringWriter()
+        def xml = new groovy.xml.MarkupBuilder(writer)
+                .configuration('xmlns': 'http://www.jooq.org/xsd/jooq-codegen-3.10.0.xsd') {
+            jdbc() {
+                driver('org.postgresql.Driver')
+                url('jdbc:postgresql://localhost:5432/mahjong_league?currentSchema=public')
+                user('mahjong_league')
+                password('mahjong_league')
+            }
+            generator() {
+                database() {
+                    schemata() {
+                        schema() {
+                            inputSchema('public')
+                        }
+                    }
+                    forcedTypes() {
+                        forcedType() {
+                            userType('com.fasterxml.jackson.databind.JsonNode')
+                            binding('com.github.mahjong.common.jdbc.jooq.PostgresJSONJacksonJsonNodeBinding')
+                            expression('public\\.league\\.description')
+                        }
+                        forcedType() {
+                            userType('com.fasterxml.jackson.databind.JsonNode')
+                            binding('com.github.mahjong.common.jdbc.jooq.PostgresJSONJacksonJsonNodeBinding')
+                            expression('public\\.league\\.name')
+                        }
+                    }
+                }
+                generate([:]) {
+                    javaTimeTypes([:], 'true')
+                }
+                target() {
+                    packageName('com.github.mahjong.league.repo.jdbc.generated')
+                    directory("$project.projectDir/src/main/generated")
+                }
+            }
+        }
+//        println writer.toString()
+
+        println "Migrating schema for project $project.projectDir"
+        Flyway flyway = new Flyway()
+        flyway.setLocations(
+                "filesystem:$project.projectDir/src/main/resources/db/init",
+                "filesystem:$project.projectDir/src/main/resources/db/migration",
+        )
+        flyway.setDataSource(
+                'jdbc:postgresql://localhost:5432/mahjong_league?currentSchema=public',
+                'mahjong_league',
+                'mahjong_league'
+        )
+        flyway.clean()
+        flyway.migrate()
+
+        println "Generating source"
+        // Run the code generator
+        // ----------------------
+        org.jooq.util.GenerationTool.generate(
+                javax.xml.bind.JAXB.unmarshal(
+                        new StringReader(writer.toString()),
+                        org.jooq.util.jaxb.Configuration.class
+                )
+        )
+        println "Sources generated"
+    }
+}
+
+compileJava.dependsOn(generate)
+
+shadowJar {
+    manifest {
+        attributes 'Main-Class': 'com.github.mahjong.league.app.LeagueMain'
+    }
+    // Make sure the cxf service files are handled correctly so that the SOAP services work.
+    // Ref https://stackoverflow.com/questions/45005287/serviceconstructionexception-when-creating-a-cxf-web-service-client-scalajava
+    transform(ServiceFileTransformer) {
+        path = 'META-INF/cxf'
+        include 'bus-extensions.txt'
+    }
+}

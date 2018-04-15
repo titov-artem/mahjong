@@ -1,0 +1,14 @@
+<div class="form-group">
+    <div class="input-group">
+        <select id="{{id}}" class="player-select">
+            <option *ngFor="let player of players" [attr.value]="player.id">{{player.name}}</option>
+        </select>
+        <select id="{{id}}-wind" class="wind-select">
+            <option value="RANDOM" selected>Random</option>
+            <option value="EAST">East</option>
+            <option value="SOUTH">South</option>
+            <option value="WEST">West</option>
+            <option value="NORTH">North</option>
+        </select>
+    </div>
+</div>

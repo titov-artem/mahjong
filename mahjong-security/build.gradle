@@ -1,0 +1,171 @@
+import org.flywaydb.core.Flyway
+import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
+
+apply plugin: 'idea'
+apply plugin: "com.github.johnrengelman.shadow"
+apply plugin: 'nebula.ospackage'
+
+dependencies {
+    compile project (':mahjong-application')
+    compile project (':mahjong-security-api')
+
+    compileOnly('org.projectlombok:lombok:1.16.20')
+    compile 'org.springframework:spring-beans:4.3.7.RELEASE'
+
+    // database
+    compile 'org.springframework:spring-jdbc:4.3.7.RELEASE'
+    compile 'com.zaxxer:HikariCP:2.6.1'
+    compile 'org.flywaydb:flyway-core:4.1.2'
+    compile 'org.postgresql:postgresql:42.0.0'
+}
+
+buildscript {
+    repositories {
+        mavenLocal()
+        jcenter()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'org.jooq:jooq-codegen:3.10.5'
+        classpath 'org.postgresql:postgresql:42.0.0'
+        classpath 'org.flywaydb:flyway-core:4.1.2'
+        classpath 'com.netflix.nebula:gradle-ospackage-plugin:4.8.0'
+        classpath "com.github.jengelman.gradle.plugins:shadow:1.2.4"
+    }
+}
+
+sourceSets {
+    main {
+        java.srcDirs += "$project.projectDir/src/main/generated/"
+    }
+}
+
+idea {
+    module {
+        generatedSourceDirs += file("$project.projectDir/src/main/generated/")
+    }
+}
+
+task generate {
+
+    doLast {
+        // Use your favourite XML builder to construct the code generation configuration file
+        // ----------------------------------------------------------------------------------
+        def writer = new StringWriter()
+        def xml = new groovy.xml.MarkupBuilder(writer)
+                .configuration('xmlns': 'http://www.jooq.org/xsd/jooq-codegen-3.10.0.xsd') {
+            jdbc() {
+                driver('org.postgresql.Driver')
+                url('jdbc:postgresql://localhost:5432/mahjong_auth?currentSchema=public')
+                user('mahjong_auth')
+                password('mahjong_auth')
+            }
+            generator() {
+                database() {
+                    schemata() {
+                        schema() {
+                            inputSchema('public')
+                        }
+                    }
+                }
+                generate([:]) {
+                    javaTimeTypes([:], 'true')
+                }
+                target() {
+                    packageName('com.github.mahjong.security.repo.jdbc.generated')
+                    directory("$project.projectDir/src/main/generated")
+                }
+            }
+        }
+//        println writer.toString()
+
+        println "Migrating schema for project $project.projectDir"
+        Flyway flyway = new Flyway()
+        flyway.setLocations(
+                "filesystem:$project.projectDir/src/main/resources/db/init",
+                "filesystem:$project.projectDir/src/main/resources/db/migration",
+        )
+        flyway.setDataSource(
+                'jdbc:postgresql://localhost:5432/mahjong_auth?currentSchema=public',
+                'mahjong_auth',
+                'mahjong_auth'
+        )
+        flyway.clean()
+        flyway.migrate()
+
+        println "Generating source"
+        // Run the code generator
+        // ----------------------
+        org.jooq.util.GenerationTool.generate(
+                javax.xml.bind.JAXB.unmarshal(
+                        new StringReader(writer.toString()),
+                        org.jooq.util.jaxb.Configuration.class
+                )
+        )
+        println "Sources generated"
+    }
+}
+
+compileJava.dependsOn(generate)
+
+shadowJar {
+    manifest {
+        attributes 'Main-Class': 'com.github.mahjong.security.app.SecurityMain'
+    }
+    // Make sure the cxf service files are handled correctly so that the SOAP services work.
+    // Ref https://stackoverflow.com/questions/45005287/serviceconstructionexception-when-creating-a-cxf-web-service-client-scalajava
+    transform(ServiceFileTransformer) {
+        path = 'META-INF/cxf'
+        include 'bus-extensions.txt'
+    }
+}
+
+// OS Package plugin configuration
+ospackage {
+    packageName = "mahjong-security"
+    version = "${project.version}"
+    release = 1
+    os = LINUX
+    type = BINARY
+    arch = NOARCH
+
+    preInstall file("deb/preInstall.sh")
+    postInstall file("deb/postInstall.sh")
+    preUninstall file("deb/preUninstall.sh")
+    postUninstall file("deb/postUninstall.sh")
+
+    into "/"
+    user "mahjong-security"
+    permissionGroup "mahjong-security"
+
+    // Copy the actual .jar file
+    from(jar.outputs.files) {
+        // Strip the version from the jar filename
+        rename { String fileName ->
+            fileName.replace("-${project.version}", "")
+        }
+        fileMode 0500
+        into "bin"
+    }
+
+    from(configurations.testRuntime) {
+        into "lib"
+    }
+
+    // Copy the config files
+//    from("install/unix/conf") {
+//        fileType CONFIG | NOREPLACE
+//        fileMode 0754
+//        into "conf"
+//    }
+}
+
+// Same as the buildRpm task
+buildDeb {
+    user "mahjong-security"
+    permissionGroup "mahjong-security"
+    directory("/opt/local/mahjong-security/log", 0755)
+    link("/etc/init.d/mahjong-security", "/opt/local/mahjong-security/bin/daemon-demo.jar")
+//    link("/opt/local/mahjong-security/bin/daemon-demo.conf", "/opt/local/daemon-demo/conf/daemon-demo.conf")
+}

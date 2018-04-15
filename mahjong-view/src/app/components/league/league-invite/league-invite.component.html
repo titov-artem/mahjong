@@ -1,0 +1,10 @@
+<div class="btn btn-default"
+     [ngClass]="{'': !showForm, 'hidden': showForm}"
+     (click)="toggleForm()">Invite</div>
+<div [ngClass]="{'': showForm, 'hidden': !showForm}" style="display: inline-block;">
+    <select #playerSelect class="selectpicker">
+        <option *ngFor="let p of players" [attr.value]="p.id">{{p.name}}</option>
+    </select>
+    <div class="btn btn-primary" (click)="invite()">Invite</div>
+    <div class="btn btn-default" (click)="toggleForm()">Cancel</div>
+</div>

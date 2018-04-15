@@ -1,0 +1,77 @@
+<div class="btn btn-primary" (click)="openCreateForm()">Create league</div>
+
+<div style="margin-top: 20px;">
+    <ul class="nav nav-tabs">
+        <li role="presentation" class="active"><a href="#tab-joined" data-toggle="tab">Joined</a></li>
+        <li role="presentation"><a href="#tab-all" data-toggle="tab">All</a></li>
+        <li role="presentation"><a href="#tab-admined" data-toggle="tab">Admin</a></li>
+    </ul>
+    <div class="tab-content">
+        <!-- TODO extract common league item component -->
+        <div class="tab-pane fade in active" id="tab-joined">
+            <div class="panel">
+                <div class="panel-body">
+                    <ul class="list-group">
+                        <li *ngFor="let league of joinedLeagues" class="list-group-item clearfix"
+                            (click)="openLeague(league.id)" style="cursor: pointer;">
+                            {{league.name}}
+                            <div class="pull-right">
+                                <div class="btn btn-success" routerLink="/leagues/{{league.id}}/start"
+                                     onclick="event.stopPropagation();">Start game
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade in" id="tab-all">
+            <div class="panel">
+                <div class="panel-body">
+                    <ul class="list-group">
+                        <li *ngFor="let league of leagues" class="list-group-item clearfix"
+                            (click)="openLeague(league.id)" style="cursor: pointer;">
+                            {{league.name}}
+                            <div *ngIf="league.memberInfo; let memberInfo" class="pull-right">
+                                <div *ngIf="memberInfo.isJoined">
+                                    <div class="btn btn-success" routerLink="/leagues/{{league.id}}/start"
+                                         onclick="event.stopPropagation();">Start game
+                                    </div>
+                                </div>
+                                <div *ngIf="!memberInfo.isJoined" class="pull-right">
+                                    <div class="btn"
+                                         [ngClass]="{
+                                         'btn-success':memberInfo.isInvited,
+                                         'btn-info': !memberInfo.isJoinRequested && !memberInfo.isInvited,
+                                         'btn-default': memberInfo.isJoinRequested && !memberInfo.isInvited
+                                         }"
+                                         [attr.disabled]="memberInfo.isJoinRequested ? 'disabled' : null"
+                                         (click)="joinLeague(league)" onclick="event.stopPropagation();">Join
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+        <div class="tab-pane fade in" id="tab-admined">
+            <div class="panel">
+                <div class="panel-body">
+                    <ul class="list-group">
+                        <li *ngFor="let league of adminedLeagues" class="list-group-item clearfix"
+                            (click)="openLeague(league.id)" style="cursor: pointer;">
+                            {{league.name}}
+                            <div class="pull-right">
+                                <div class="btn btn-success" routerLink="/leagues/{{league.id}}/start"
+                                     onclick="event.stopPropagation();">Start game
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

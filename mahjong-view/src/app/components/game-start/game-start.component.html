@@ -1,0 +1,51 @@
+<div>
+    <div class="row">
+        <form class="col-lg-offset-4 col-lg-4">
+            <div class="pull-right">
+                <player-select [players]="players" [id]="'player1'"
+                               (selectionUpdatedEvent)="playerSelectUpdated($event)">
+                </player-select>
+                <player-select [players]="players" [id]="'player2'"
+                               (selectionUpdatedEvent)="playerSelectUpdated($event)">
+                </player-select>
+                <player-select [players]="players" [id]="'player3'"
+                               (selectionUpdatedEvent)="playerSelectUpdated($event)">
+                </player-select>
+                <player-select [players]="players" [id]="'player4'"
+                               (selectionUpdatedEvent)="playerSelectUpdated($event)">
+                </player-select>
+            </div>
+        </form>
+    </div>
+    <div *ngIf="hasError()" class="row">
+        <div class="alert alert-danger col-lg-offset-4 col-lg-4">
+            {{getErrorMessage()}}
+        </div>
+    </div>
+    <div *ngIf="!hasError()" class="row">
+        <div class="col-lg-offset-4 col-lg-4">
+            <div class="panel panel-success mahjong-table">
+                <div class="panel-body">
+                    <div class="row" style="padding-bottom: 20px;">
+                        <div class="col-lg-12 text-center">東 - {{getPlayerOnEast()}}</div>
+                    </div>
+                    <div class="row" style="padding-bottom: 20px;">
+                        <div class="col-lg-6 pull-left">南 - {{getPlayerOnSouth()}}</div>
+                        <div class="col-lg-6"><span class="pull-right">北 - {{getPlayerOnNorth()}}</span></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12 text-center">西 - {{getPlayerOnWest()}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-offset-4 col-lg-2">
+            <div class="btn btn-success pull-right" style="width: 100px;" (click)="start()">Start</div>
+        </div>
+        <div class="col-lg-2">
+            <div class="btn btn-default pull-left" style="width: 100px;" routerLink="/">Cancel</div>
+        </div>
+    </div>
+</div>

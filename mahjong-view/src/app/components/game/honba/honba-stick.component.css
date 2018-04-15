@@ -1,0 +1,37 @@
+.honba {
+    position: relative;
+    background-color: white;
+    border: 1px black solid;
+    border-radius: 5px;
+    height: 10px;
+    width: 60px;
+}
+
+.honba .honba-dots {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin: 0;
+    transform: translate(-50%, -50%);
+    -webkit-transform: translate(-50%, -50%);
+    -moz-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    -o-transform: translate(-50%, -50%);
+}
+
+.honba .honba-dots .honba-dot {
+    width: 2px;
+    height: 1px;
+    background-color: black;
+    display: table-cell;
+}
+
+.honba .honba-dots .honba-dot-horizontal-delim {
+    width: 1px;
+    height: 1px;
+    display: table-cell;
+}
+
+.honba .honba-dots .honba-dot-vertical-delim {
+    height: 1px;
+}

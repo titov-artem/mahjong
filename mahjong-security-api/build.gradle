@@ -1,0 +1,21 @@
+apply plugin: 'idea'
+
+dependencies {
+    compile project(':mahjong-api-common')
+
+    compileOnly('org.projectlombok:lombok:1.16.20')
+
+    compile 'javax.inject:javax.inject:1'
+
+    // rest api
+    compile 'org.apache.cxf:cxf-rt-rs-client:3.1.10'
+    compile 'javax.servlet:javax.servlet-api:3.1.0'
+
+    // utility
+    compile 'org.slf4j:slf4j-api:1.7.12'
+
+    // security
+    compile 'org.springframework.security:spring-security-core:3.2.4.RELEASE'
+    compile 'org.springframework.security:spring-security-web:3.2.4.RELEASE'
+    compile 'org.springframework.security:spring-security-config:3.2.4.RELEASE'
+}

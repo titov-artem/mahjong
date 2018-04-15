@@ -1,0 +1,101 @@
+<div *ngIf="game != null">
+    <div *ngIf="showCombinationSelect" class="row">
+        <div class="col-xs-12 col-md-offset-3 col-md-6">
+            <combination-select (combinationsSelectedEvent)="onCombinationsSelected($event)"></combination-select>
+        </div>
+    </div>
+    <div class="row" [ngClass]="{'hidden': showCombinationSelect}">
+        <div class="col-xs-12 col-md-offset-3 col-md-6">
+            <div class="mahjong-table">
+                <div class="vertical-content-left pull-right" style="margin-top: 40%">
+                    <div class="text-center">
+                        <game-player *ngIf="!isRoundComplete" (click)="recountFor('NORTH')"
+                                     [name]="getPlayerNameOn('NORTH')"
+                                     [wind]="getCurrentWindOn('NORTH')"
+                                     [score]="getScoreOn('NORTH')"></game-player>
+                        <game-player-score *ngIf="isRoundComplete" [question]="'Tempai?'"
+                                           [wind]="getCurrentWindOn('NORTH')"
+                                           [playerId]="getPlayerIdOn('NORTH')" [withNone]="!isDraw"
+                                           (playerResultUpdatedEvent)="onPlayerResultUpdated($event)"></game-player-score>
+                    </div>
+                </div>
+                <div class="vertical-content-right pull-left" style="margin-top: 40%">
+                    <div class="text-center">
+                        <game-player *ngIf="!isRoundComplete" (click)="recountFor('SOUTH')"
+                                     [name]="getPlayerNameOn('SOUTH')"
+                                     [wind]="getCurrentWindOn('SOUTH')"
+                                     [score]="getScoreOn('SOUTH')"></game-player>
+                        <game-player-score *ngIf="isRoundComplete" [question]="'Tempai?'"
+                                           [wind]="getCurrentWindOn('SOUTH')"
+                                           [playerId]="getPlayerIdOn('SOUTH')" [withNone]="!isDraw"
+                                           (playerResultUpdatedEvent)="onPlayerResultUpdated($event)"></game-player-score>
+                    </div>
+                </div>
+                <div class="row" style="position: absolute; top: 20px; width: 100%;">
+                    <div class="text-center">
+                        <game-player *ngIf="!isRoundComplete" (click)="recountFor('EAST')"
+                                     [name]="getPlayerNameOn('EAST')"
+                                     [wind]="getCurrentWindOn('EAST')"
+                                     [score]="getScoreOn('EAST')"></game-player>
+                        <game-player-score *ngIf="isRoundComplete" [question]="'Tempai?'"
+                                           [wind]="getCurrentWindOn('EAST')"
+                                           [playerId]="getPlayerIdOn('EAST')" [withNone]="!isDraw"
+                                           (playerResultUpdatedEvent)="onPlayerResultUpdated($event)"></game-player-score>
+                    </div>
+                </div>
+                <div class="row" style="position: absolute; bottom: 20px; width: 100%;">
+                    <div class="text-center">
+                        <game-player *ngIf="!isRoundComplete" (click)="recountFor('WEST')"
+                                     [name]="getPlayerNameOn('WEST')"
+                                     [wind]="getCurrentWindOn('WEST')"
+                                     [score]="getScoreOn('WEST')"></game-player>
+                        <game-player-score *ngIf="isRoundComplete" [question]="'Tempai?'"
+                                           [wind]="getCurrentWindOn('WEST')"
+                                           [playerId]="getPlayerIdOn('WEST')" [withNone]="!isDraw"
+                                           (playerResultUpdatedEvent)="onPlayerResultUpdated($event)"></game-player-score>
+                    </div>
+                </div>
+
+                <div class="game-info">
+                    <div>
+                        {{game.currentWindRoundNumber}} {{getCurrentWindSymbol()}}
+                    </div>
+                    <div>
+                        <div style="display: inline-block">
+                            <riichi-stick></riichi-stick>
+                        </div>
+                        {{game.riichiSticksOnTable}}
+                    </div>
+                    <div>
+                        <div style="display: inline-block">
+                            <honba-stick></honba-stick>
+                        </div>
+                        {{game.honbaCount}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" [ngClass]="{'hidden': showCombinationSelect}" style="margin-top: 10px;">
+        <div class="col-xs-12 col-md-offset-3 col-md-6">
+            <div class="btn-group btn-group-justified" role="group">
+                <div class="btn" [ngClass]="{'btn-success': isRon, 'btn-default': !isRon}"
+                     (click)="ron()">Ron
+                </div>
+                <div class="btn"
+                     [ngClass]="{'btn-success': isTsumo, 'btn-default': !isTsumo}"
+                     (click)="tsumo()">Tsumo
+                </div>
+                <div class="btn" [ngClass]="{'btn-success': isDraw, 'btn-default': !isDraw}"
+                     (click)="draw()">Draw
+                </div>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="isRoundComplete" class="row" [ngClass]="{'hidden': showCombinationSelect}" style="margin-top: 10px;">
+        <div class="col-xs-12 col-md-offset-3 col-md-6 text-center">
+            <div class="btn btn-primary" (click)="submit()">Submit</div>
+            <div class="btn btn-default" (click)="roundContinue()">Cancel</div>
+        </div>
+    </div>
+</div>

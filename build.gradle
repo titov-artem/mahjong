@@ -1,0 +1,49 @@
+apply plugin: 'java'
+
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral();
+}
+
+configurations.all {
+    resolutionStrategy {
+        failOnVersionConflict()
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'groovy'
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+    compileJava.options.encoding = 'UTF-8'
+
+    group = 'ru.spb.yandex.majang'
+    version = '1.0-SNAPSHOT'
+
+    repositories {
+        mavenCentral()
+    }
+
+    configurations {
+        provided
+    }
+
+    sourceSets {
+        main.compileClasspath += configurations.provided
+        test.compileClasspath += configurations.provided
+        test.runtimeClasspath += configurations.provided
+    }
+
+    dependencies {
+
+    }
+
+    configurations {
+        all*.exclude group: 'commons-logging'
+    }
+}
+

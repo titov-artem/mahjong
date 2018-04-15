@@ -1,0 +1,35 @@
+.game-player {
+    display: inline-block;
+    padding: 0;
+    cursor: pointer;
+}
+
+.game-player .player-wind {
+    font-size: 30pt;
+}
+
+.game-player .player-container {
+    display: inline-block;
+    padding: 0;
+    margin-left: 10px;
+}
+
+.game-player .player-score {
+    font-size: 20pt;
+    font-weight: bolder;
+}
+
+.game-player .player-score .player-score-ending {
+    margin-left: 5px;
+    font-size: 70%;
+    font-weight: normal;
+}
+
+.game-player .player-name {
+    font-size: 10pt;
+    overflow-wrap: break-word;
+    width: 70px;
+    height: 24px;
+    line-height: 11px;
+    overflow-y: hidden;
+}

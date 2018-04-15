@@ -1,0 +1,26 @@
+apply plugin: 'idea'
+
+dependencies {
+    compile 'com.google.guava:guava:18.0'
+    compile 'org.apache.commons:commons-lang3:3.3.2'
+
+    // context
+    compile 'org.springframework:spring-context:4.3.7.RELEASE'
+
+    // rest api
+    compile 'javax.ws.rs:javax.ws.rs-api:2.0.1'
+
+    // serialization
+    compile 'com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.8.7'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.8.7'
+    compile 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.8.7'
+
+    // db
+    compile 'org.jooq:jooq:3.10.5'
+
+    // utility
+    compile 'org.slf4j:slf4j-api:1.7.12'
+    compile 'ch.qos.logback:logback-classic:1.1.2'
+    compile 'org.slf4j:jcl-over-slf4j:1.7.24'
+    compile 'com.google.code.findbugs:jsr305:2.0.3'
+}

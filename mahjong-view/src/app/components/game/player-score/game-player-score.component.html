@@ -1,0 +1,25 @@
+<div class="game-player-score">
+    <div class="player-wind pull-left">{{wind}}</div>
+    <div class="player-container">
+        <div [ngClass]="{'riichi-active': hasRiichi, 'riichi-inactive': !hasRiichi}">
+            <riichi-stick (click)="riichi()"></riichi-stick>
+        </div>
+        <div style="height: 10px;"></div>
+        <div class="row">
+            <div class="col-xs-12 col-md-12">
+                <div>
+                    <div class="btn-group" role="group">
+                        <div class="btn btn-sm" [ngClass]="{'btn-success': isYes(), 'btn-default': !isYes()}"
+                             (click)="yes()">
+                            <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+                        </div>
+                        <div class="btn btn-sm" [ngClass]="{'btn-danger': isNo(), 'btn-default': !isNo()}"
+                             (click)="no()">
+                            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

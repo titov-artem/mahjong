@@ -1,0 +1,19 @@
+<div class="row">
+    <div class="col-xs-offset-1 col-xs-10 col-md-offset-4 col-md-4">
+        <h1>Sign in</h1>
+        <form class="form-horizontal">
+            <div class="form-group">
+                <label for="login">Login</label>
+                <input #login type="text" class="form-control" id="login" placeholder="Login">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input #password type="password" class="form-control" id="password" placeholder="Password">
+            </div>
+            <div class="form-group">
+                <button class="btn btn-primary" (click)="signIn(login.value, password.value)">Sign in</button>
+                <button class="btn btn-default" routerLink="/signup">Sign up</button>
+            </div>
+        </form>
+    </div>
+</div>

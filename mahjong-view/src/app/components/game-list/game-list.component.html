@@ -1,0 +1,9 @@
+<ul class="list-group">
+    <li *ngFor="let game of games" class="list-group-item" (click)="openGame(game)">
+        Wind: {{game.currentWind}}; Players:
+        東 - {{getPlayerOnEast(game)}} ({{getScoreOnEast(game)}})
+        南 - {{getPlayerOnSouth(game)}} ({{getScoreOnSouth(game)}})
+        西 - {{getPlayerOnWest(game)}} ({{getScoreOnWest(game)}})
+        北 - {{getPlayerOnNorth(game)}} ({{getScoreOnNorth(game)}})
+    </li>
+</ul>

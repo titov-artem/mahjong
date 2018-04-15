@@ -1,0 +1,35 @@
+I - Improvements of existing applications and APIs
+==================================================
+
+1. Statistics:
+1.1. Main.
+1.1.1. Places percentage
+1.1.2. Pay per game (?)
+1.1.3. Hands distribution
+1.2. League
+1.2.1. League board (player - total score - avg place - games played)
+
+2. Game start options
+2.1. UI - rules selection
+2.2. UI - winds to play selection
+2.3. UI - start points selection
+2.4. UI - uma selection
+
+3. League labels and by label games union
+3.1. Add support of labels on leagues
+3.2. Add support of viewing stats per label
+
+4. Add full support of penalties
+4.1. Add checks in game service
+4.2. Add ability to add penalti on UI
+
+5. League events
+League event is a free playing inside league with specified start and end date.
+Each league has single active event and infinite amount of past events.
+When current active event is completed the new infinite one will be created.
+Event duration can be edited by any league admin.
+League statistic will be available on per event basis.
+Each event produce specific event-label, so its games can be views in per label stat-view
+
+II - Tournaments
+================

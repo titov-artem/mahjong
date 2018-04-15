@@ -1,0 +1,35 @@
+.game-player-score {
+    display: inline-block;
+    padding: 0;
+    cursor: pointer;
+}
+
+.game-player-score .player-wind {
+    font-size: 30pt;
+    /*margin-top: -5px;*/
+}
+
+.game-player-score .player-container {
+    display: inline-block;
+    padding: 0;
+    margin-left: 10px;
+}
+
+.game-player-score .player-han {
+    font-size: 20pt;
+    font-weight: bolder;
+}
+
+.game-player-score .player-fu {
+    margin-left: 5px;
+    font-size: 70%;
+    font-weight: normal;
+}
+
+.riichi-active {
+    opacity: 1;
+}
+
+.riichi-inactive {
+    opacity: 0.1;
+}

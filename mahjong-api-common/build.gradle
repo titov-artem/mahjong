@@ -1,0 +1,10 @@
+apply plugin: 'idea'
+
+dependencies {
+    // rest api
+    compile 'javax.ws.rs:javax.ws.rs-api:2.0.1'
+    compile 'javax.validation:validation-api:2.0.1.Final'
+
+    // utility
+    compile 'com.google.code.findbugs:jsr305:2.0.3'
+}

@@ -1,0 +1,19 @@
+apply plugin: 'idea'
+
+dependencies {
+    compile project(':mahjong-common')
+    compile project(':mahjong-security-api')
+
+    // jetty
+    compile 'org.eclipse.jetty:jetty-server:9.4.2.v20170220'
+    compile 'org.eclipse.jetty:jetty-util:9.4.2.v20170220'
+    compile 'org.eclipse.jetty:jetty-servlet:9.4.2.v20170220'
+
+    // endpoint
+    compile 'org.springframework:spring-context:4.3.7.RELEASE'
+
+    // cxf
+    compile 'org.apache.cxf:cxf-rt-frontend-jaxrs:3.1.10'
+    compile 'org.apache.cxf:cxf-rt-rs-service-description:3.1.10'
+    compile 'javax.inject:javax.inject:1'
+}

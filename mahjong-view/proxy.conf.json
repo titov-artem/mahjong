@@ -1,0 +1,29 @@
+{
+  "/api/auth": {
+    "target": "http://localhost:8080",
+    "secure": false,
+    "logLevel": "debug",
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/api": "services/api"
+    }
+  },
+  "/api/main/*": {
+    "target": "http://localhost:8081",
+    "secure": false,
+    "logLevel": "debug",
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/api": "services/api"
+    }
+  },
+  "/api/league/*": {
+    "target": "http://localhost:8082",
+    "secure": false,
+    "logLevel": "debug",
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/api": "services/api"
+    }
+  }
+}
