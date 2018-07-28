@@ -117,12 +117,20 @@ export class CombinationSelectComponent implements OnInit, AfterViewInit {
         return this.playerCombinations.has(code);
     }
 
+    private doraSelect() {
+        return $(`#dora-count`);
+    }
+
+    private fuSelect() {
+        return $(`#fu-count`);
+    }
+
     done() {
         console.log(this.playerCombinations);
         this.combinationsSelectedEvent.emit(new PlayerCombinations(
             Array.from(this.playerCombinations),
-            0,
-            30,
+            this.doraSelect().find('option:selected').val(),
+            this.fuSelect().find('option:selected').val(),
             this.isOpenHand
         ));
     }

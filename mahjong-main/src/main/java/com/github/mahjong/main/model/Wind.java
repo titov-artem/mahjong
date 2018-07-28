@@ -41,5 +41,4 @@ public enum Wind {
         return Arrays.asList(EAST, SOUTH, WEST, NORTH);
     }
 
-
 }

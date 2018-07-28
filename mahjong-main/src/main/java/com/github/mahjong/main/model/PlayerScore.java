@@ -1,5 +1,6 @@
 package com.github.mahjong.main.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.util.List;
@@ -23,4 +24,17 @@ public class PlayerScore {
      */
     private final boolean tempai;
 
+    public PlayerScore(@JsonProperty("combinationCodes") List<String> combinationCodes,
+                       @JsonProperty("doraCount") int doraCount,
+                       @JsonProperty("fuCount") int fuCount,
+                       @JsonProperty("openHand") boolean openHand,
+                       @JsonProperty("riichi") boolean riichi,
+                       @JsonProperty("tempai") boolean tempai) {
+        this.combinationCodes = combinationCodes;
+        this.doraCount = doraCount;
+        this.fuCount = fuCount;
+        this.openHand = openHand;
+        this.riichi = riichi;
+        this.tempai = tempai;
+    }
 }

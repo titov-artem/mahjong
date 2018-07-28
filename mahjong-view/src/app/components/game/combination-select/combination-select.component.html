@@ -2,7 +2,7 @@
     <div class="col-xs-6">
         <div class="input-group">
             <span class="input-group-addon">Dora</span>
-            <select #dora_count class="selectpicker form-control">
+            <select #dora_count id="dora-count" class="selectpicker form-control">
                 <option *ngFor="let i of range(0, 20, 1)">{{i}}</option>
             </select>
         </div>
@@ -10,7 +10,7 @@
     <div class="col-xs-6">
         <div class="input-group">
             <span class="input-group-addon">Fu</span>
-            <select #fu_count class="selectpicker form-control">
+            <select #fu_count id="fu-count" class="selectpicker form-control">
                 <option>20</option>
                 <option>25</option>
                 <option *ngFor="let i of range(30, 130, 10)">{{i}}</option>
