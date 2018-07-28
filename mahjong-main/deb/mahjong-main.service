@@ -1,0 +1,24 @@
+[Unit]
+Description=Service for storing mahjong players and games and provide base statisticcs and APIs
+After=syslog.target
+After=network.target
+After=postgresql.service
+Requires=postgresql.service
+
+[Service]
+Type=forking
+PIDFile=/var/run/mahjong-main/mahjong-main.pid
+WorkingDirectory=/etc/mahjong-main
+
+User=mahjong-main
+Group=mahjong-main
+
+OOMScoreAdjust=-1000
+
+ExecStart=/usr/bin/mahjong-main.sh start
+ExecStop=/usr/bin/mahjong-main.sh stop
+ExecReload=/usr/bin/mahjong-main.sh restart
+TimeoutSec=300
+
+[Install]
+WantedBy=multi-user.target

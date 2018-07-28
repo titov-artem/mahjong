@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -35,11 +36,15 @@ public class CookieService {
 
     private final Clock clock;
 
+    private final int maxKeyLength;
+
     @Inject
-    public CookieService(UserRepo userRepo, AuthTokenRepo authTokenRepo, Clock clock) {
+    public CookieService(UserRepo userRepo, AuthTokenRepo authTokenRepo, Clock clock) throws GeneralSecurityException {
         this.userRepo = userRepo;
         this.authTokenRepo = authTokenRepo;
         this.clock = clock;
+        this.maxKeyLength = CryptoUtil.getMaxKeyLengthBytes();
+        log.info("Max permitted key length is {} bytes", maxKeyLength);
     }
 
     public void validateAuthCookie(AuthCookies cookies) {
@@ -117,12 +122,13 @@ public class CookieService {
         }
     }
 
-    private String adoptPassPhrase(String passPhrase) throws GeneralSecurityException {
-        int maxKeyLength = CryptoUtil.getMaxKeyLengthBytes() / 8;
-        if (passPhrase.length() > maxKeyLength) {
+    private String adoptPassPhrase(String passPhrase) {
+        byte[] passPhraseBytes = passPhrase.getBytes();
+        if (passPhraseBytes.length > maxKeyLength) {
             log.warn("Pass phrase too long. Using only first {} bytes", maxKeyLength);
-            return passPhrase.substring(0, maxKeyLength);
+            passPhraseBytes = Arrays.copyOfRange(passPhraseBytes, 0, maxKeyLength);
         }
-        return passPhrase;
+        log.info("Using passphrase of length {}", passPhraseBytes.length);
+        return new String(passPhraseBytes);
     }
 }

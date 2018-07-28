@@ -3,6 +3,7 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransf
 
 apply plugin: 'idea'
 apply plugin: "com.github.johnrengelman.shadow"
+apply plugin: 'nebula.ospackage'
 
 dependencies {
     compile project (':mahjong-main-public-api')
@@ -10,7 +11,6 @@ dependencies {
     compile project (':mahjong-application')
 
     compileOnly('org.projectlombok:lombok:1.16.20')
-    compile 'javax.validation:validation-api:2.0.1.Final'
 
     compile 'org.springframework:spring-beans:4.3.7.RELEASE'
 
@@ -43,6 +43,7 @@ buildscript {
         classpath 'org.postgresql:postgresql:42.0.0'
         classpath 'org.flywaydb:flyway-core:4.1.2'
         classpath "com.github.jengelman.gradle.plugins:shadow:1.2.4"
+        classpath 'com.netflix.nebula:gradle-ospackage-plugin:4.8.0'
     }
 }
 
@@ -136,4 +137,48 @@ shadowJar {
         path = 'META-INF/cxf'
         include 'bus-extensions.txt'
     }
+}
+
+// OS Package plugin configuration
+ospackage {
+    packageName = "mahjong-main"
+    version = "${project.version}"
+    release = 1
+    os = LINUX
+    type = BINARY
+
+    preInstall file("deb/preInstall.sh")
+    postInstall file("deb/postInstall.sh")
+    preUninstall file("deb/preUninstall.sh")
+    postUninstall file("deb/postUninstall.sh")
+
+    user "mahjong-main"
+    permissionGroup "mahjong-main"
+
+    into("/usr/lib/mahjong-main") {
+        // Copy the actual .jar file
+        from(jar.outputs.files) {
+        }
+        from(configurations.testRuntime) {
+        }
+    }
+    into("/usr/lib/systemd/system/") {
+        from "deb/mahjong-main.service"
+    }
+    into("/usr/bin/") {
+        from "deb/mahjong-main.sh"
+        fileMode 0755
+    }
+    into("/etc/mahjong-main/") {
+        from "deb/db-init.sh"
+        fileMode 0755
+    }
+}
+
+buildDeb {
+    user "mahjong-main"
+    permissionGroup "mahjong-main"
+    directory("/var/log/mahjong-main", 0755)
+    directory("/etc/mahjong-main/", 0755)
+    directory("/var/run/mahjong-main/", 0755)
 }

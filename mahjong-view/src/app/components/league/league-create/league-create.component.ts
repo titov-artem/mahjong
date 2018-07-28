@@ -1,4 +1,5 @@
 import {Component, OnInit} from '@angular/core';
+import {Globals} from '../../../globals';
 import {Router} from '@angular/router';
 import {LeagueService} from '../../../services/league.service';
 import {EnumsService} from '../../../services/enums.service';
@@ -16,7 +17,8 @@ export class LeagueCreateComponent implements OnInit {
 
     constructor(private router: Router,
                 private leagueService: LeagueService,
-                private enumsService: EnumsService) {
+                private enumsService: EnumsService,
+                private globals: Globals) {
     }
 
     ngOnInit() {
@@ -42,7 +44,7 @@ export class LeagueCreateComponent implements OnInit {
         let leagueForm = new LeagueForm();
         leagueForm.name = name;
         leagueForm.description = description;
-        leagueForm.admins = [];
+        leagueForm.admins = [this.globals.player.id];
         this.leagueService.create(leagueForm).subscribe(_ => { this.router.navigate(["leagues"])});
     }
 

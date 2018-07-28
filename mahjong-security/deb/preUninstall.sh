@@ -1,2 +1,2 @@
 #!/bin/sh
-service mahjong-security stop
+systemctl stop mahjong-security

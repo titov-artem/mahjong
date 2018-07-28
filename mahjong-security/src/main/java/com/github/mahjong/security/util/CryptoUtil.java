@@ -12,7 +12,9 @@ public class CryptoUtil {
     private static final String ALGORITHM = "Blowfish";
 
     public static int getMaxKeyLengthBytes() throws GeneralSecurityException {
-        return Cipher.getMaxAllowedKeyLength(ALGORITHM);
+        // TODO this not working on Ubuntu. It returns just 2147483640 / 8
+        // return Cipher.getMaxAllowedKeyLength(ALGORITHM) / 8;
+        return 16;
     }
 
     public static String encryptString(final String source, final String passphrase) throws GeneralSecurityException {

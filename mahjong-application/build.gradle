@@ -4,6 +4,11 @@ dependencies {
     compile project(':mahjong-common')
     compile project(':mahjong-security-api')
 
+    // validation
+    compile 'org.hibernate:hibernate-validator:6.0.11.Final'
+    compile 'javax.el:javax.el-api:3.0.0'
+    compile 'org.glassfish.web:javax.el:2.2.6'
+
     // jetty
     compile 'org.eclipse.jetty:jetty-server:9.4.2.v20170220'
     compile 'org.eclipse.jetty:jetty-util:9.4.2.v20170220'

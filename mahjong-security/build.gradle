@@ -157,7 +157,6 @@ ospackage {
     }
 }
 
-// Same as the buildRpm task
 buildDeb {
     user "mahjong-security"
     permissionGroup "mahjong-security"

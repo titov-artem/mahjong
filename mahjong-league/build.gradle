@@ -3,12 +3,13 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransf
 
 apply plugin: 'idea'
 apply plugin: "com.github.johnrengelman.shadow"
+apply plugin: 'nebula.ospackage'
 
 dependencies {
-    compile project (':mahjong-application')
-    compile project (':mahjong-api-common')
-    compile project (':mahjong-main-public-api')
-    compile project (':mahjong-main-private-api')
+    compile project(':mahjong-application')
+    compile project(':mahjong-api-common')
+    compile project(':mahjong-main-public-api')
+    compile project(':mahjong-main-private-api')
 
     compileOnly('org.projectlombok:lombok:1.16.20')
     compile 'org.springframework:spring-beans:4.3.7.RELEASE'
@@ -42,6 +43,7 @@ buildscript {
         classpath 'org.postgresql:postgresql:42.0.0'
         classpath 'org.flywaydb:flyway-core:4.1.2'
         classpath "com.github.jengelman.gradle.plugins:shadow:1.2.4"
+        classpath 'com.netflix.nebula:gradle-ospackage-plugin:4.8.0'
     }
 }
 
@@ -141,4 +143,48 @@ shadowJar {
         path = 'META-INF/cxf'
         include 'bus-extensions.txt'
     }
+}
+
+// OS Package plugin configuration
+ospackage {
+    packageName = "mahjong-league"
+    version = "${project.version}"
+    release = 1
+    os = LINUX
+    type = BINARY
+
+    preInstall file("deb/preInstall.sh")
+    postInstall file("deb/postInstall.sh")
+    preUninstall file("deb/preUninstall.sh")
+    postUninstall file("deb/postUninstall.sh")
+
+    user "mahjong-league"
+    permissionGroup "mahjong-league"
+
+    into("/usr/lib/mahjong-league") {
+        // Copy the actual .jar file
+        from(jar.outputs.files) {
+        }
+        from(configurations.testRuntime) {
+        }
+    }
+    into("/usr/lib/systemd/system/") {
+        from "deb/mahjong-league.service"
+    }
+    into("/usr/bin/") {
+        from "deb/mahjong-league.sh"
+        fileMode 0755
+    }
+    into("/etc/mahjong-league/") {
+        from "deb/db-init.sh"
+        fileMode 0755
+    }
+}
+
+buildDeb {
+    user "mahjong-league"
+    permissionGroup "mahjong-league"
+    directory("/var/log/mahjong-league", 0755)
+    directory("/etc/mahjong-league/", 0755)
+    directory("/var/run/mahjong-league/", 0755)
 }
