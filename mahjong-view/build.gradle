@@ -1,0 +1,75 @@
+import com.netflix.gradle.plugins.packaging.Dependency
+
+apply plugin: 'nebula.ospackage'
+
+buildscript {
+    repositories {
+        mavenLocal()
+        jcenter()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'com.netflix.nebula:gradle-ospackage-plugin:4.8.0'
+    }
+}
+
+task buildAngular(type: Exec) {
+    // installAngular should be run prior to this task
+    dependsOn "installAngular"
+    workingDir "."
+    inputs.dir "."
+    // Add task to the standard build group
+    group = BasePlugin.BUILD_GROUP
+    // ng doesn't exist as a file in windows -> ng.cmd
+    if (System.getProperty("os.name").toUpperCase().contains("WINDOWS")){
+        commandLine "ng.cmd", "build"
+    } else {
+        commandLine "ng", "build"
+    }
+}
+
+task installAngular(type: Exec) {
+    workingDir "."
+    inputs.dir "."
+    group = BasePlugin.BUILD_GROUP
+    if (System.getProperty("os.name").toUpperCase().contains("WINDOWS")){
+        commandLine "npm.cmd", "install"
+    } else {
+        commandLine "npm", "install"
+    }
+}
+
+// OS Package plugin configuration
+ospackage {
+    packageName = "mahjong-view"
+    version = "${project.version}"
+    release = 1
+    os = LINUX
+    type = BINARY
+
+    preInstall file("deb/preInstall.sh")
+    postInstall file("deb/postInstall.sh")
+    preUninstall file("deb/preUninstall.sh")
+    postUninstall file("deb/postUninstall.sh")
+
+    user "mahjong-view"
+    permissionGroup "mahjong-view"
+    dependencies = [new Dependency("nginx", ">= 1", 0)]
+
+    into("/usr/lib/mahjong-view/www") {
+        // Copy packed angular files
+        from("dist") {
+        }
+    }
+    into("/etc/nginx/conf.d/") {
+        // Copy nginx configuration to the server conf dir
+        from "deb/mahjong.conf"
+    }
+}
+
+buildDeb {
+}
+
+buildDeb.dependsOn(buildAngular)
+
