@@ -52,3 +52,5 @@ Angular based UI uniting all backend service into single application.
 
 Service requires Postgres database and Java to run. It can be packed into debian package with
 `buildDeb` gradle target. It will require node and npm installed on your machine.
+
+To run this you will also require nginx installed on your server machine.
