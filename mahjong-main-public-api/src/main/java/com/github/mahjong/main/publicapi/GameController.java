@@ -6,10 +6,9 @@ import com.github.mahjong.main.publicapi.dto.RoundScoreDto;
 import org.apache.cxf.jaxrs.ext.PATCH;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.*;
 import java.util.List;
 
 @Path("/game")
@@ -25,5 +24,7 @@ public interface GameController extends REST {
 
     @Path("/{id}")
     @PATCH
-    GameView roundComplete(@PathParam("id") @NotNull Long id, @NotNull @Valid RoundScoreDto score);
+    GameView roundComplete(@PathParam("id") @NotNull Long id,
+                           @NotNull @Valid RoundScoreDto score,
+                           @NotNull @DefaultValue("false") Boolean dryRun);
 }

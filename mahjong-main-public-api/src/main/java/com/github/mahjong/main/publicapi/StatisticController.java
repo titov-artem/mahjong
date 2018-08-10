@@ -14,7 +14,7 @@ public interface StatisticController extends REST {
 
     @Path("/place-distribution")
     @GET
-    PlaceDistributionView getPlaceDistribution();
+    PlaceDistributionView getPlaceDistribution(@QueryParam("rules") @NotNull String rulesSetCode);
 
     @Path("/combination-distribution")
     @GET

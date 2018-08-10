@@ -10,6 +10,7 @@ public class PlaceDistributionView {
 
     private static final BigDecimal HUNDRED = BigDecimal.valueOf(100);
 
+    public String rulesSetCode;
     public int gamesPlayed;
     /**
      * Average player's place. Will be null if player played 0 games
@@ -22,17 +23,19 @@ public class PlaceDistributionView {
     public @Nullable
     Map<Integer, BigDecimal> placePercentage;
 
-    public PlaceDistributionView(int gamesPlayed,
+    public PlaceDistributionView(String rulesSetCode,
+                                 int gamesPlayed,
                                  BigDecimal avgPlace,
                                  Map<Integer, BigDecimal> placePercentage) {
+        this.rulesSetCode = rulesSetCode;
         this.gamesPlayed = gamesPlayed;
         this.avgPlace = avgPlace;
         this.placePercentage = placePercentage;
     }
 
-    public static PlaceDistributionView from(Map<Integer, Integer> placesCount) {
+    public static PlaceDistributionView from(String rulesSetCode, Map<Integer, Integer> placesCount) {
         if (placesCount.isEmpty()) {
-            return new PlaceDistributionView(0, null, null);
+            return new PlaceDistributionView(rulesSetCode, 0, null, null);
         }
         int gamesPlayed = 0;
         int summedPlace = 0;
@@ -53,6 +56,7 @@ public class PlaceDistributionView {
             );
         });
         return new PlaceDistributionView(
+                rulesSetCode,
                 gamesPlayed,
                 BigDecimal.valueOf(summedPlace).divide(gamesPlayedBD, 2, RoundingMode.HALF_UP),
                 placePercentage

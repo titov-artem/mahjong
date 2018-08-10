@@ -19,6 +19,7 @@ import com.github.mahjong.main.service.model.RoundScore;
 import org.springframework.stereotype.Controller;
 
 import javax.inject.Inject;
+import javax.validation.constraints.Max;
 import java.util.*;
 
 import static java.util.function.Function.identity;
@@ -58,6 +59,11 @@ public class GameControllerImpl extends AbstractPlayerAwareController implements
     }
 
     @Override
+    public List<GameView> getLastGames(Integer count) {
+        return null;
+    }
+
+    @Override
     public GameView get(Long id) {
         Game game = gameRepo.get(id).orElseThrow(GameNotFoundException.supplier(id));
         return GameViewHelper.from(
@@ -68,7 +74,7 @@ public class GameControllerImpl extends AbstractPlayerAwareController implements
     }
 
     @Override
-    public GameView roundComplete(Long id, RoundScoreDto score) {
+    public GameView roundComplete(Long id, RoundScoreDto score, Boolean dryRun) {
         Game game = gameRepo.get(id).orElseThrow(GameNotFoundException.supplier(id));
         RulesSet rulesSet = rulesSetRegistry.getRulesSet(game.getGameData().getRulesSetCode())
                 .orElseThrow(RulesSetNotFoundException.supplier(game.getGameData().getRulesSetCode()));
@@ -109,7 +115,8 @@ public class GameControllerImpl extends AbstractPlayerAwareController implements
         );
         Game updatedGame = gameService.roundComplete(
                 game,
-                roundScore
+                roundScore,
+                dryRun
         );
         return GameViewHelper.from(
                 updatedGame,

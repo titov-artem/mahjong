@@ -30,12 +30,13 @@ public class StatisticControllerImpl extends AbstractPlayerAwareController imple
     }
 
     @Override
-    public PlaceDistributionView getPlaceDistribution() {
+    public PlaceDistributionView getPlaceDistribution(String rulesSetCode) {
         Player currentPlayer = getCurrentPlayer();
         List<Game> games = gameRepo.getAllByPlayer(currentPlayer);
         Map<Integer, Integer> placesCount = new HashMap<>();
         games.stream()
                 .filter(Game::isCompleted)
+                .filter(game -> game.getGameData().getRulesSetCode().equals(rulesSetCode))
                 .forEach(game -> {
                     Integer place = game.getPlayerToPlace().get(game.getPlayerIds().indexOf(currentPlayer.getId()));
                     if (place == null) {
@@ -47,7 +48,7 @@ public class StatisticControllerImpl extends AbstractPlayerAwareController imple
                     Integer count = placesCount.putIfAbsent(place, 0);
                     placesCount.put(place, (count == null ? 0 : count) + 1);
                 });
-        return PlaceDistributionView.from(placesCount);
+        return PlaceDistributionView.from(rulesSetCode, placesCount);
     }
 
     @Override

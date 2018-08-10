@@ -77,7 +77,16 @@ public class GameService {
         return out;
     }
 
-    public Game roundComplete(Game game, RoundScore score) {
+    /**
+     * Update the game with specified round score and return update version. If dry run set to true,
+     * the updated version won't be stored into database.
+     *
+     * @param game   game to update
+     * @param score  current round score
+     * @param dryRun is it dry run
+     * @return updated game with next round started, if applicable by rules set
+     */
+    public Game roundComplete(Game game, RoundScore score, boolean dryRun) {
         Preconditions.checkArgument(!game.isCompleted(), "Game already completed");
         // Check that there are scores for all players
         game.getPlayerIds().forEach(playerId -> {
@@ -143,11 +152,11 @@ public class GameService {
         if (gameEndOptions != null) {
             switch (gameEndOptions) {
                 case END:
-                    return gameRepo.update(completeGame(game));
+                    return updateGame(completeGame(game), dryRun);
                 case REPEAT_ROUND:
                     gameData.getRounds().add(Round.start(
                             currentRound.getDealerId(), currentRound.getWind(), riichiSticksCount, honbaSticksCount));
-                    return gameRepo.update(game);
+                    return updateGame(game, dryRun);
                 case PLAY_NEXT_WIND:
                     throw new NotImplementedException("Play next wind after last wind in the game currently not supported");
             }
@@ -157,7 +166,7 @@ public class GameService {
         if (honbaSticksCount > 0) {
             // It means that we need to repeat last round
             gameData.getRounds().add(Round.start(currentRound.getDealerId(), currentRound.getWind(), riichiSticksCount, honbaSticksCount));
-            return gameRepo.update(game);
+            return updateGame(game, dryRun);
         }
 
         // We need to switch dealer
@@ -165,7 +174,14 @@ public class GameService {
         Round nextRound = Round.start(nextDealerId, nextRoundWind, riichiSticksCount, honbaSticksCount);
 
         gameData.getRounds().add(nextRound);
-        return gameRepo.update(game);
+        return updateGame(game, dryRun);
+    }
+
+    private Game updateGame(Game newVersion, boolean dryRun) {
+        if (dryRun) {
+            return newVersion;
+        }
+        return gameRepo.update(newVersion);
     }
 
     private Long getNextDealerId(Round currentRound, GameSeating seating) {
