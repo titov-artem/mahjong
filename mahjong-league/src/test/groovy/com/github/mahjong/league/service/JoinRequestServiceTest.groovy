@@ -18,6 +18,7 @@ import java.time.LocalDateTime
 class JoinRequestServiceTest extends Specification {
 
     private final DummyClock clock = new DummyClock()
+    private final DummyTxHelper txHelper = new DummyTxHelper()
 
     def "approve; by admin"() {
         given:
@@ -31,7 +32,7 @@ class JoinRequestServiceTest extends Specification {
                 return Optional.empty()
             }
         }
-        def service = new JoinRequestService(jrRepo, lpRepo, clock, new DummyTxHelper())
+        def service = new JoinRequestService(jrRepo, lpRepo, clock, txHelper)
         def updatedRequest;
 
         when:
@@ -49,7 +50,7 @@ class JoinRequestServiceTest extends Specification {
         given:
         def jrRepo = Mock(JoinRequestRepo)
         def lpRepo = Mock(LeaguePlayerRepo)
-        def service = new JoinRequestService(jrRepo, lpRepo, clock, new DummyTxHelper())
+        def service = new JoinRequestService(jrRepo, lpRepo, clock, txHelper)
 
         def admin = new Player(1L, "", "", LangIso639.EN)
         def player = new Player(2L, "", "", LangIso639.EN)
@@ -67,7 +68,7 @@ class JoinRequestServiceTest extends Specification {
         given:
         def jrRepo = Mock(JoinRequestRepo)
         def lpRepo = Mock(LeaguePlayerRepo)
-        def service = new JoinRequestService(jrRepo, lpRepo, clock, new DummyTxHelper())
+        def service = new JoinRequestService(jrRepo, lpRepo, clock, txHelper)
 
         def admin = new Player(1L, "", "", LangIso639.EN)
         def league1 = new League(1L, [:], [:], [admin.id] as Set)
@@ -89,7 +90,7 @@ class JoinRequestServiceTest extends Specification {
                 jrRepo,
                 lpRepo,
                 Clock.offset(clock, Duration.ofDays(JoinRequestService.JOIN_REQUEST_EXPIRE_PERIOD_DAYS + 1)),
-                new DummyTxHelper())
+                txHelper)
 
         def admin = new Player(1L, "", "", LangIso639.EN)
         def league = new League(1L, [:], [:], [admin.id] as Set)
@@ -115,7 +116,7 @@ class JoinRequestServiceTest extends Specification {
                 return Optional.empty()
             }
         }
-        def service = new JoinRequestService(jrRepo, lpRepo, clock, new DummyTxHelper())
+        def service = new JoinRequestService(jrRepo, lpRepo, clock, txHelper)
         def updatedRequest;
 
         when:
@@ -133,7 +134,7 @@ class JoinRequestServiceTest extends Specification {
         given:
         def jrRepo = Mock(JoinRequestRepo)
         def lpRepo = Mock(LeaguePlayerRepo)
-        def service = new JoinRequestService(jrRepo, lpRepo, clock, new DummyTxHelper())
+        def service = new JoinRequestService(jrRepo, lpRepo, clock, txHelper)
         def reason = "reason"
 
         def admin = new Player(1L, "", "", LangIso639.EN)
@@ -152,7 +153,7 @@ class JoinRequestServiceTest extends Specification {
         given:
         def jrRepo = Mock(JoinRequestRepo)
         def lpRepo = Mock(LeaguePlayerRepo)
-        def service = new JoinRequestService(jrRepo, lpRepo, clock, new DummyTxHelper())
+        def service = new JoinRequestService(jrRepo, lpRepo, clock, txHelper)
         def reason = "reason"
 
         def admin = new Player(1L, "", "", LangIso639.EN)
@@ -175,7 +176,7 @@ class JoinRequestServiceTest extends Specification {
                 jrRepo,
                 lpRepo,
                 Clock.offset(clock, Duration.ofDays(JoinRequestService.JOIN_REQUEST_EXPIRE_PERIOD_DAYS + 1)),
-                new DummyTxHelper())
+                txHelper)
         def reason = "reason"
 
         def admin = new Player(1L, "", "", LangIso639.EN)

@@ -19,7 +19,7 @@ import java.util.UUID;
 @Service
 public class InvitationService {
 
-    public static final int INVITATION_EXPIRE_PERIOD = 30;
+    public static final int INVITATION_EXPIRE_PERIOD_DAYS = 30;
 
     private final InvitationRepo invitationRepo;
     private final LeaguePlayerRepo leaguePlayerRepo;
@@ -45,13 +45,13 @@ public class InvitationService {
         }
         return txHelper.defaultTx(() -> {
             LocalDateTime now = LocalDateTime.now(clock);
-            LocalDateTime expireAt = now.plusDays(INVITATION_EXPIRE_PERIOD);
+            LocalDateTime expireAt = now.plusDays(INVITATION_EXPIRE_PERIOD_DAYS);
 
             Optional<Invitation> activeOpt = invitationRepo.getActiveByPlayerAndLeagueForUpdate(
                     player.getId(), league.getId());
             if (activeOpt.isPresent()) {
                 invitationRepo.prolongActive(activeOpt.get().getId(), author.getId(), expireAt);
-                //noinspection ConstantConditions: exist becuase found previously and blocked by current transaction
+                //noinspection ConstantConditions: exist because found previously and blocked by current transaction,OptionalGetWithoutIsPresent
                 return invitationRepo.get(activeOpt.get().getId()).get();
             }
             String code = UUID.randomUUID().toString();

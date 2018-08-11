@@ -18,7 +18,7 @@ public class Invitation {
     private final Status status;
 
     public boolean isExpired(Clock clock) {
-        return expireAt.isBefore(LocalDateTime.now(clock));
+        return status == Status.EXPIRED || expireAt.isBefore(LocalDateTime.now(clock));
     }
 
     public static Invitation createNew(long leagueId,
@@ -35,6 +35,7 @@ public class Invitation {
     }
 
     public enum Status {
-        ACTIVE, ACCEPTED, REJECTED
+        // todo add job to mark expired invitations with status EXPIRED
+        ACTIVE, ACCEPTED, REJECTED, EXPIRED
     }
 }

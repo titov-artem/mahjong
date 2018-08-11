@@ -41,7 +41,7 @@ public class JoinRequest {
     }
 
     public boolean isExpired(Clock clock) {
-        return expireAt.isBefore(LocalDateTime.now(clock));
+        return decision == Decision.EXPIRED || expireAt.isBefore(LocalDateTime.now(clock));
     }
 
     public JoinRequest approved(Long reviewerId, Clock clock) {
