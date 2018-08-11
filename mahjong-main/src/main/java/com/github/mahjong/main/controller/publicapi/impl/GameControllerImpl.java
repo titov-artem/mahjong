@@ -16,10 +16,12 @@ import com.github.mahjong.main.rules.RulesSetRegistry;
 import com.github.mahjong.main.service.GameService;
 import com.github.mahjong.main.model.PlayerScore;
 import com.github.mahjong.main.service.model.RoundScore;
+import com.google.common.base.Preconditions;
 import org.springframework.stereotype.Controller;
 
 import javax.inject.Inject;
 import javax.validation.constraints.Max;
+import javax.validation.constraints.NotNull;
 import java.util.*;
 
 import static java.util.function.Function.identity;
@@ -59,12 +61,7 @@ public class GameControllerImpl extends AbstractPlayerAwareController implements
     }
 
     @Override
-    public List<GameView> getLastGames(Integer count) {
-        return null;
-    }
-
-    @Override
-    public GameView get(Long id) {
+    public GameView get(@NotNull Long id) {
         Game game = gameRepo.get(id).orElseThrow(GameNotFoundException.supplier(id));
         return GameViewHelper.from(
                 game,
@@ -74,7 +71,9 @@ public class GameControllerImpl extends AbstractPlayerAwareController implements
     }
 
     @Override
-    public GameView roundComplete(Long id, RoundScoreDto score, Boolean dryRun) {
+    public GameView roundComplete(@NotNull Long id,
+                                  @NotNull RoundScoreDto score,
+                                  @NotNull Boolean dryRun) {
         Game game = gameRepo.get(id).orElseThrow(GameNotFoundException.supplier(id));
         RulesSet rulesSet = rulesSetRegistry.getRulesSet(game.getGameData().getRulesSetCode())
                 .orElseThrow(RulesSetNotFoundException.supplier(game.getGameData().getRulesSetCode()));
@@ -93,10 +92,19 @@ public class GameControllerImpl extends AbstractPlayerAwareController implements
                                 } else if (ps.combinationCodes.contains(riichi.getCode())) {
                                     ps.riichi = true;
                                 }
+                            } else {
+                                // If rules doesn't support riichi, ensure that riichi is 0
+                                Preconditions.checkArgument(!ps.riichi,
+                                        "Game rules set doesn't support riichi");
                             }
                             if (ps.riichi && score.winners.isEmpty() && score.losers.isEmpty()) {
                                 // Ensure that in round with draw player with riichi has tempai.
                                 ps.tempai = true;
+                            }
+                            if (ps.tempai) {
+                                // Ensure that players with tempai not among winners
+                                Preconditions.checkArgument(!score.winners.contains(ps.playerId),
+                                        "Winner has complete hand and can't be in tempai");
                             }
                         })
                         .collect(toMap(

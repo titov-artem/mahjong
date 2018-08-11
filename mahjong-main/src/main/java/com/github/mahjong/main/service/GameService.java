@@ -165,15 +165,15 @@ public class GameService {
         // Game needn't be complete at this point
         if (honbaSticksCount > 0) {
             // It means that we need to repeat last round
-            gameData.getRounds().add(Round.start(currentRound.getDealerId(), currentRound.getWind(), riichiSticksCount, honbaSticksCount));
+            gameData.getRounds().add(Round.start(
+                    currentRound.getDealerId(), currentRound.getWind(), riichiSticksCount, honbaSticksCount));
             return updateGame(game, dryRun);
         }
 
         // We need to switch dealer
         Long nextDealerId = getNextDealerId(currentRound, seating);
-        Round nextRound = Round.start(nextDealerId, nextRoundWind, riichiSticksCount, honbaSticksCount);
+        gameData.getRounds().add(Round.start(nextDealerId, nextRoundWind, riichiSticksCount, honbaSticksCount));
 
-        gameData.getRounds().add(nextRound);
         return updateGame(game, dryRun);
     }
 

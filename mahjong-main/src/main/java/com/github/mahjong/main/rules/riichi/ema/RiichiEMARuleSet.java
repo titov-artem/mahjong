@@ -77,7 +77,6 @@ public class RiichiEMARuleSet implements RulesSet {
 
     @Override
     public void calculateRoundScore(RoundScore roundScore, Round round, GameSeating seating) {
-        // todo set combinations
         if (roundScore.isDraw()) {
             processDraw(round, roundScore);
             return;

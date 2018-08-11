@@ -21,10 +21,20 @@ public interface RulesSet {
 
     List<Combination> getAvailableCombinations();
 
+    /**
+     * @return if rules support riichi, returns combination for riichi, otherwise returns empty
+     */
     default Optional<Combination> getRiichiCombination() {
         return Optional.empty();
     }
 
+    /**
+     * Set score on specified round basing on rules score evaluation algorithm.
+     *
+     * @param roundScore received score for this round
+     * @param round      round to update
+     * @param seating    players seating
+     */
     void calculateRoundScore(RoundScore roundScore,
                              Round round,
                              GameSeating seating);
@@ -37,7 +47,7 @@ public interface RulesSet {
      * @param scoreByPlayer   score by player
      * @param dealerId        dealer
      * @param isDealerSucceed is dealer won in last round or had a tempai
-     * @return
+     * @return action, that have to be made
      */
     GameEndOptions canCompleteGame(Map<Long, Integer> scoreByPlayer, Long dealerId, boolean isDealerSucceed);
 
