@@ -4,7 +4,7 @@ import com.github.mahjong.common.enums.LangIso639;
 import com.github.mahjong.common.json.JsonUtil;
 import com.github.mahjong.league.model.League;
 import com.github.mahjong.league.repo.LeagueRepo;
-import com.github.mahjong.league.repo.TransactionalHelper;
+import com.github.mahjong.common.jdbc.TransactionalHelper;
 import com.google.common.collect.Sets;
 import org.jooq.Record;
 import org.jooq.RecordMapper;

@@ -5,7 +5,7 @@ import com.github.mahjong.league.model.League;
 import com.github.mahjong.league.model.LeaguePlayer;
 import com.github.mahjong.league.repo.JoinRequestRepo;
 import com.github.mahjong.league.repo.LeaguePlayerRepo;
-import com.github.mahjong.league.repo.TransactionalHelper;
+import com.github.mahjong.common.jdbc.TransactionalHelper;
 import com.github.mahjong.league.service.model.Player;
 import com.google.common.base.Preconditions;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,7 @@ import java.util.Optional;
 @Service
 public class JoinRequestService {
 
-    public static final int JOIN_REQUEST_EXPIRE_PERIOD = 30;
+    public static final int JOIN_REQUEST_EXPIRE_PERIOD_DAYS = 30;
 
     private final JoinRequestRepo joinRequestRepo;
     private final LeaguePlayerRepo leaguePlayerRepo;
@@ -43,7 +43,7 @@ public class JoinRequestService {
         JoinRequest request = JoinRequest.createNew(league.getId(),
                 player.getId(),
                 now,
-                now.plusDays(JOIN_REQUEST_EXPIRE_PERIOD)
+                now.plusDays(JOIN_REQUEST_EXPIRE_PERIOD_DAYS)
         );
         return joinRequestRepo.create(request);
     }

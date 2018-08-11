@@ -1,4 +1,4 @@
-package com.github.mahjong.league.repo;
+package com.github.mahjong.common.jdbc;
 
 import java.util.function.Supplier;
 

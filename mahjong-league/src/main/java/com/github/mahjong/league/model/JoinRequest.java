@@ -24,7 +24,8 @@ public class JoinRequest {
 
 
     public enum Decision {
-        PENDING, APPROVED, REJECTED;
+        // todo add job to periodically mark expired requests as expired
+        PENDING, APPROVED, REJECTED, EXPIRED;
     }
 
     public static JoinRequest createNew(Long leagueId, Long playerId, LocalDateTime createdAt, LocalDateTime expireAt) {

@@ -1,6 +1,6 @@
 package com.github.mahjong.league.repo.jdbc;
 
-import com.github.mahjong.league.repo.TransactionalHelper;
+import com.github.mahjong.common.jdbc.TransactionalHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

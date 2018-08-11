@@ -5,7 +5,7 @@ import com.github.mahjong.league.model.League;
 import com.github.mahjong.league.model.LeaguePlayer;
 import com.github.mahjong.league.repo.InvitationRepo;
 import com.github.mahjong.league.repo.LeaguePlayerRepo;
-import com.github.mahjong.league.repo.TransactionalHelper;
+import com.github.mahjong.common.jdbc.TransactionalHelper;
 import com.github.mahjong.league.service.model.Player;
 import com.google.common.base.Preconditions;
 import org.springframework.stereotype.Service;
