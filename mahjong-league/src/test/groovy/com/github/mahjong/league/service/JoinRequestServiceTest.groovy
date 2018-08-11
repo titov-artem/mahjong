@@ -102,6 +102,93 @@ class JoinRequestServiceTest extends Specification {
         thrown(IllegalArgumentException)
     }
 
+    def "reject; by admin"() {
+        given:
+        def admin = new Player(2L, "", "", LangIso639.EN)
+        def league = new League(1L, [:], [:], [admin.id] as Set)
+        def request = pendingRequest(3L, league.id)
+        def reason = "reason"
+
+        def jrRepo = Mock(JoinRequestRepo)
+        def lpRepo = Mock(LeaguePlayerRepo) {
+            get(league.id, request.playerId) >> { Long leagueId, Long playerId ->
+                return Optional.empty()
+            }
+        }
+        def service = new JoinRequestService(jrRepo, lpRepo, clock, new DummyTxHelper())
+        def updatedRequest;
+
+        when:
+        service.reject(league, request, admin, reason)
+
+        then:
+        noExceptionThrown()
+        1 * jrRepo.update(_) >> { JoinRequest r -> updatedRequest = r }
+        updatedRequest.decision == JoinRequest.Decision.REJECTED
+        updatedRequest.reviewedBy == admin.id
+        0 * lpRepo.create(_ as LeaguePlayer)
+    }
+
+    def "reject; by not admin"() {
+        given:
+        def jrRepo = Mock(JoinRequestRepo)
+        def lpRepo = Mock(LeaguePlayerRepo)
+        def service = new JoinRequestService(jrRepo, lpRepo, clock, new DummyTxHelper())
+        def reason = "reason"
+
+        def admin = new Player(1L, "", "", LangIso639.EN)
+        def player = new Player(2L, "", "", LangIso639.EN)
+        def league = new League(1L, [:], [:], [admin.id] as Set)
+        def request = pendingRequest(3L, league.id)
+
+        when:
+        service.reject(league, request, player, reason)
+
+        then:
+        thrown(IllegalArgumentException)
+    }
+
+    def "reject; by admin; wrong league"() {
+        given:
+        def jrRepo = Mock(JoinRequestRepo)
+        def lpRepo = Mock(LeaguePlayerRepo)
+        def service = new JoinRequestService(jrRepo, lpRepo, clock, new DummyTxHelper())
+        def reason = "reason"
+
+        def admin = new Player(1L, "", "", LangIso639.EN)
+        def league1 = new League(1L, [:], [:], [admin.id] as Set)
+        def league2 = new League(2L, [:], [:], [admin.id] as Set)
+        def request = pendingRequest(3L, league1.id)
+
+        when:
+        service.reject(league2, request, admin, reason)
+
+        then:
+        thrown(IllegalArgumentException)
+    }
+
+    def "reject; by admin; expired"() {
+        given:
+        def jrRepo = Mock(JoinRequestRepo)
+        def lpRepo = Mock(LeaguePlayerRepo)
+        def service = new JoinRequestService(
+                jrRepo,
+                lpRepo,
+                Clock.offset(clock, Duration.ofDays(JoinRequestService.JOIN_REQUEST_EXPIRE_PERIOD_DAYS + 1)),
+                new DummyTxHelper())
+        def reason = "reason"
+
+        def admin = new Player(1L, "", "", LangIso639.EN)
+        def league = new League(1L, [:], [:], [admin.id] as Set)
+        def request = pendingRequest(3L, league.id)
+
+        when:
+        service.reject(league, request, admin, reason)
+
+        then:
+        thrown(IllegalArgumentException)
+    }
+
     def pendingRequest(long playerId, long leagueId) {
         return new JoinRequest(
                 1L,
