@@ -9,6 +9,7 @@ import java.util.Base64;
 
 public class CryptoUtil {
 
+    // todo maybe use another algorithm here
     private static final String ALGORITHM = "Blowfish";
 
     public static int getMaxKeyLengthBytes() throws GeneralSecurityException {

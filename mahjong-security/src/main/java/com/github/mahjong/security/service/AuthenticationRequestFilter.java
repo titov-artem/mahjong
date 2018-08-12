@@ -36,7 +36,7 @@ public class AuthenticationRequestFilter implements Filter {
 
         UsernamePasswordAuthenticationToken auth = null;
 
-        // try to authorize via login and password
+        // try to authenticate via login and password
         Map<String, String[]> params = req.getParameterMap();
         String loginParam = getParam(LOGIN_PARAM, params);
         String passwordParam = getParam(PASSWORD_PARAM, params);
@@ -48,7 +48,7 @@ public class AuthenticationRequestFilter implements Filter {
             auth.setDetails(AuthenticationType.LOGIN_PASSWORD);
         }
 
-        // try to authorize via cookie
+        // try to authenticate via cookie
         if (auth == null && req instanceof HttpServletRequest) {
             Optional<AuthCookies> authCookiesOpt = AuthCookies.fromCookiesList(((HttpServletRequest) req).getCookies());
             if (authCookiesOpt.isPresent()) {
