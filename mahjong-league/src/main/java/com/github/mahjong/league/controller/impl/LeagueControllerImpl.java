@@ -22,6 +22,7 @@ import com.google.common.collect.Sets;
 import org.springframework.stereotype.Controller;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -93,7 +94,7 @@ public class LeagueControllerImpl extends AbstractLeagueAwareController implemen
     }
 
     @Override
-    public LeagueView create(LeagueForm form) {
+    public LeagueView create(@NotNull LeagueForm form) {
         League league = form.toLeague();
         for (Long adminId : league.getAdmins()) {
             //noinspection ResultOfMethodCallIgnored: check that admin players exists
@@ -109,7 +110,7 @@ public class LeagueControllerImpl extends AbstractLeagueAwareController implemen
     }
 
     @Override
-    public LeagueView get(Long id) {
+    public LeagueView get(@NotNull Long id) {
         Player currentPlayer = getCurrentPlayer();
         Optional<LeaguePlayer> leaguePlayer = leaguePlayerRepo.get(id, currentPlayer.getId());
         Optional<JoinRequest> request = joinRequestRepo.getPendingByPlayerAndLeague(currentPlayer.getId(), id);
@@ -122,7 +123,7 @@ public class LeagueControllerImpl extends AbstractLeagueAwareController implemen
     }
 
     @Override
-    public LeagueView addAdmin(Long id, Set<Long> admins) {
+    public LeagueView addAdmin(@NotNull Long id, @NotNull Set<Long> admins) {
         League league = getLeagueInternal(id, true);
         Set<Long> leaguePlayerIds = leaguePlayerRepo.getAllByLeague(league.getId(), admins).stream()
                 .map(LeaguePlayer::getPlayerId)
@@ -145,7 +146,7 @@ public class LeagueControllerImpl extends AbstractLeagueAwareController implemen
     }
 
     @Override
-    public LeagueView removeAdmin(Long id, Set<Long> admins) {
+    public LeagueView removeAdmin(@NotNull Long id, @NotNull Set<Long> admins) {
         League league = getLeagueInternal(id, true);
         for (Long adminId : admins) {
             //noinspection ResultOfMethodCallIgnored: check that admin players exists

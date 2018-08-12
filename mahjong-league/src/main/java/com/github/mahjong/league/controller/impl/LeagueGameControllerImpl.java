@@ -17,7 +17,6 @@ import org.springframework.stereotype.Controller;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.NotFoundException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -45,7 +44,7 @@ public class LeagueGameControllerImpl extends AbstractLeagueAwareController impl
     }
 
     @Override
-    public List<GameView> getAll(Long leagueId) {
+    public List<GameView> getAll(@NotNull Long leagueId) {
         League league = getLeagueInternal(leagueId, false);
         Player currentPlayer = getCurrentPlayer();
         //noinspection ResultOfMethodCallIgnored: Check that player belongs to league
@@ -64,7 +63,7 @@ public class LeagueGameControllerImpl extends AbstractLeagueAwareController impl
     }
 
     @Override
-    public GameView start(Long leagueId, GameStartForm form) {
+    public GameView start(@NotNull Long leagueId, @NotNull GameStartForm form) {
         // todo add tests and fix bug: can start game with players not in league
         Player currentPlayer = getCurrentPlayer();
         Set<Long> playerIds = new HashSet<>(form.players);

@@ -1,6 +1,5 @@
 package com.github.mahjong.league.controller.impl;
 
-import com.github.mahjong.common.enums.LangIso639;
 import com.github.mahjong.league.controller.InvitationController;
 import com.github.mahjong.league.controller.dto.InvitationForm;
 import com.github.mahjong.league.controller.dto.InvitationView;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Controller;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.NotFoundException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +59,7 @@ public class InvitationControllerImpl extends AbstractLeagueAwareController impl
     }
 
     @Override
-    public InvitationView create(InvitationForm form) {
+    public InvitationView create(@NotNull InvitationForm form) {
         Player currentPlayer = getCurrentPlayer();
         // todo maybe here we should load league player instead of all these stuff?
         League league = getLeagueInternal(form.leagueId, false);
@@ -79,7 +77,7 @@ public class InvitationControllerImpl extends AbstractLeagueAwareController impl
     }
 
     @Override
-    public void accept(String code) {
+    public void accept(@NotNull String code) {
         Player currentPlayer = getCurrentPlayer();
         Invitation invitation = invitationRepo.getActiveByPlayerAndCode(currentPlayer.getId(), code)
                 .orElseThrow(InvitationNotFoundException.supplier(code));

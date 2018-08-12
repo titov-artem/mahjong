@@ -9,6 +9,7 @@ import com.github.mahjong.league.service.PlayerCacheService;
 import org.springframework.stereotype.Controller;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Set;
 
@@ -29,7 +30,7 @@ public class LeaguePlayerControllerImpl implements LeaguePlayerController {
     }
 
     @Override
-    public List<PlayerShortView> getAll(Long leagueId) {
+    public List<PlayerShortView> getAll(@NotNull Long leagueId) {
         Set<Long> playerIds = leaguePlayerRepo.getAllByLeague(leagueId).stream()
                 .map(LeaguePlayer::getPlayerId)
                 .collect(toSet());

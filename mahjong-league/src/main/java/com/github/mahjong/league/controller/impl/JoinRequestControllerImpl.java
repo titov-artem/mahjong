@@ -17,7 +17,7 @@ import com.google.common.collect.ImmutableMap;
 import org.springframework.stereotype.Controller;
 
 import javax.inject.Inject;
-import javax.ws.rs.NotFoundException;
+import javax.validation.constraints.NotNull;
 import java.util.*;
 
 import static java.util.function.Function.identity;
@@ -51,7 +51,7 @@ public class JoinRequestControllerImpl extends AbstractLeagueAwareController imp
     }
 
     @Override
-    public List<JoinRequestView> getAllIngoing(Long leagueId) {
+    public List<JoinRequestView> getAllIngoing(@NotNull Long leagueId) {
         // check that current player is admin of this league
         League league = getLeagueInternal(leagueId, true);
         Player currentPlayer = getCurrentPlayer();
@@ -63,7 +63,7 @@ public class JoinRequestControllerImpl extends AbstractLeagueAwareController imp
     }
 
     @Override
-    public JoinRequestView create(JoinRequestForm form) {
+    public JoinRequestView create(@NotNull JoinRequestForm form) {
         // check, that league exists
         League league = getLeagueInternal(form.leagueId, false);
         Player currentPlayer = getCurrentPlayer();
@@ -74,7 +74,7 @@ public class JoinRequestControllerImpl extends AbstractLeagueAwareController imp
     }
 
     @Override
-    public void approve(Long id) {
+    public void approve(@NotNull Long id) {
         JoinRequest request = joinRequestRepo.get(id)
                 .orElseThrow(JoinRequestNotFoundException.supplier(id));
         League league = getLeagueInternal(request.getLeagueId(), true);
@@ -82,7 +82,7 @@ public class JoinRequestControllerImpl extends AbstractLeagueAwareController imp
     }
 
     @Override
-    public void reject(Long id, JoinRequestRejectForm form) {
+    public void reject(@NotNull Long id, @NotNull JoinRequestRejectForm form) {
         Preconditions.checkArgument(Objects.equals(id, form.id), "Path id and form id are diffferent");
         JoinRequest request = joinRequestRepo.get(id)
                 .orElseThrow(JoinRequestNotFoundException.supplier(id));
