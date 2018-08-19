@@ -1,5 +1,6 @@
 package com.github.mahjong.main.publicapi.dto;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,10 +19,12 @@ public class PlayerScoreDto {
     /**
      * Count of doras
      */
+    @Min(0)
     public int doraCount;
     /**
      * Amount of fu points
      */
+    @Min(0)
     public int fuCount;
     /**
      * True if player opened his hand

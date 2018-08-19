@@ -6,8 +6,6 @@ import com.github.mahjong.main.model.Player
 import com.github.mahjong.main.model.PlayerScore
 import com.github.mahjong.main.model.Wind
 import com.github.mahjong.main.repo.GameRepo
-import com.github.mahjong.main.rules.RulesSet
-import com.github.mahjong.main.rules.RulesSetRegistry
 import com.github.mahjong.main.rules.riichi.ema.RiichiEMACombination
 import com.github.mahjong.main.rules.riichi.ema.RiichiEMARuleSet
 import com.github.mahjong.main.service.model.GamePlayers
@@ -18,7 +16,7 @@ class GameServiceTest extends Specification {
 
     def "roundComplete; ron; switch dialer"() {
         given:
-        def service = new GameService(riichiEmaRulesSetRegistry(), createUpdateOnlyGameRepo())
+        def service = new GameService(new RiichiEmaRulesSetRegistry(), createUpdateOnlyGameRepo())
         def game = service.startGame(gamePlayers(), new RiichiEMARuleSet(), 30000, [Wind.EAST] as Set, false)
         def score = new RoundScore(
                 [
@@ -50,7 +48,7 @@ class GameServiceTest extends Specification {
 
     def "roundComplete; ron; keep dialer"() {
         given:
-        def service = new GameService(riichiEmaRulesSetRegistry(), createUpdateOnlyGameRepo())
+        def service = new GameService(new RiichiEmaRulesSetRegistry(), createUpdateOnlyGameRepo())
         def game = service.startGame(gamePlayers(), new RiichiEMARuleSet(), 30000, [Wind.EAST] as Set, false)
         def score = new RoundScore(
                 [
@@ -82,7 +80,7 @@ class GameServiceTest extends Specification {
 
     def "roundComplete; draw; switch dialer"() {
         given:
-        def service = new GameService(riichiEmaRulesSetRegistry(), createUpdateOnlyGameRepo())
+        def service = new GameService(new RiichiEmaRulesSetRegistry(), createUpdateOnlyGameRepo())
         def game = service.startGame(gamePlayers(), new RiichiEMARuleSet(), 30000, [Wind.EAST] as Set, false)
         def score = new RoundScore(
                 [
@@ -115,7 +113,7 @@ class GameServiceTest extends Specification {
 
     def "roundComplete; draw; keep dialer"() {
         given:
-        def service = new GameService(riichiEmaRulesSetRegistry(), createUpdateOnlyGameRepo())
+        def service = new GameService(new RiichiEmaRulesSetRegistry(), createUpdateOnlyGameRepo())
         def game = service.startGame(gamePlayers(), new RiichiEMARuleSet(), 30000, [Wind.EAST] as Set, false)
         def score = new RoundScore(
                 [
@@ -176,23 +174,4 @@ class GameServiceTest extends Specification {
         }
     }
 
-    def riichiEmaRulesSetRegistry() {
-        return new RulesSetRegistry() {
-
-            private final RulesSet riichiEmaRulesSet = new RiichiEMARuleSet()
-
-            @Override
-            Collection<RulesSet> getRegistered() {
-                return [riichiEmaRulesSet]
-            }
-
-            @Override
-            Optional<RulesSet> getRulesSet(String code) {
-                if (!Objects.equals(code, riichiEmaRulesSet.getCode())) {
-                    return Optional.empty()
-                }
-                return Optional.of(riichiEmaRulesSet)
-            }
-        }
-    }
 }

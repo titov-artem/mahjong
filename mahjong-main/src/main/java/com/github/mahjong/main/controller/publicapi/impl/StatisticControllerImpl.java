@@ -2,7 +2,6 @@ package com.github.mahjong.main.controller.publicapi.impl;
 
 import com.github.mahjong.common.exceptions.InternalInvariantFailedException;
 import com.github.mahjong.main.model.Game;
-import com.github.mahjong.main.model.GameData;
 import com.github.mahjong.main.model.Player;
 import com.github.mahjong.main.publicapi.StatisticController;
 import com.github.mahjong.main.publicapi.dto.statistic.CombinationDistributionView;
@@ -12,6 +11,7 @@ import com.github.mahjong.main.repo.PlayerRepo;
 import org.springframework.stereotype.Controller;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +30,7 @@ public class StatisticControllerImpl extends AbstractPlayerAwareController imple
     }
 
     @Override
-    public PlaceDistributionView getPlaceDistribution(String rulesSetCode) {
+    public PlaceDistributionView getPlaceDistribution(@NotNull String rulesSetCode) {
         Player currentPlayer = getCurrentPlayer();
         List<Game> games = gameRepo.getAllByPlayer(currentPlayer);
         Map<Integer, Integer> placesCount = new HashMap<>();
@@ -38,7 +38,7 @@ public class StatisticControllerImpl extends AbstractPlayerAwareController imple
                 .filter(Game::isCompleted)
                 .filter(game -> game.getGameData().getRulesSetCode().equals(rulesSetCode))
                 .forEach(game -> {
-                    Integer place = game.getPlayerToPlace().get(game.getPlayerIds().indexOf(currentPlayer.getId()));
+                    Integer place = game.getPlayerToPlace().get(currentPlayer.getId());
                     if (place == null) {
                         throw new InternalInvariantFailedException(String.format(
                                 "Failed to get player's place. Player id %d, game id: %d",
@@ -52,7 +52,7 @@ public class StatisticControllerImpl extends AbstractPlayerAwareController imple
     }
 
     @Override
-    public CombinationDistributionView getCombinationDistribution(String rulesSetCode) {
+    public CombinationDistributionView getCombinationDistribution(@NotNull String rulesSetCode) {
         Player currentPlayer = getCurrentPlayer();
         List<String> allGatheredCombinations = gameRepo.getAllByPlayer(currentPlayer).stream()
                 .filter(game -> game.getGameData().getRulesSetCode().equals(rulesSetCode))

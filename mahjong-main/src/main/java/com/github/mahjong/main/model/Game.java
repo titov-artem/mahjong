@@ -56,10 +56,18 @@ public class Game {
         return out;
     }
 
+    public void setFinalScore(Map<Long, Integer> score) {
+        this.finalScore = new ArrayList<>(playerIds.size());
+        for (Long playerId : playerIds) {
+            finalScore.add(score.get(playerId));
+        }
+    }
+
     /**
-     * @return place to player index in the list returned by {@link #getPlayerIds()}
+     * @return map from player id to his place
      */
-    public BiMap<Integer, Integer> getPlayerToPlace() {
+    public BiMap<Long, Integer> getPlayerToPlace() {
+        // TODO rewrite it on easier solution
         List<Integer> currentScore = getCurrentScore();
         List<Pair<Integer, Integer>> scoreWithPlayerIdx = new ArrayList<>();
         for (int i = 0; i < currentScore.size(); i++) {
@@ -73,10 +81,10 @@ public class Game {
             return p1.getRight().compareTo(p2.getRight());
         });
 
-        BiMap<Integer, Integer> out = HashBiMap.create();
+        BiMap<Long, Integer> out = HashBiMap.create();
         for (int i = 0; i < scoreWithPlayerIdx.size(); i++) {
             out.put(
-                    scoreWithPlayerIdx.get(i).getRight(),
+                    playerIds.get(scoreWithPlayerIdx.get(i).getRight()),
                     i + 1  // place
             );
         }

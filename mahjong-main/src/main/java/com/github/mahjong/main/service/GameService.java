@@ -105,18 +105,21 @@ public class GameService {
         RulesSet rulesSet = rulesSetOpt.get();
 
         // Set current round results.
-        rulesSet.calculateRoundScore(score, currentRound, seating);
+        Map<Long, Integer> roundScores = rulesSet.calculateRoundScore(score, currentRound, seating);
+        currentRound.setScores(roundScores);
         currentRound.setRawScores(score.getPlayerIdToScore());
 
         // Get honba and riichi sticks for next round.
         int riichiSticksCount = currentRound.getRiichiSticksCount();
         int honbaSticksCount = currentRound.getHonbaSticksCount();
+        boolean dealerSucceed = false;
         if (!score.getWinners().isEmpty()) {
             // There is winner, so no more riichi on the table
             riichiSticksCount = 0;
             if (score.getWinners().contains(currentRound.getDealerId())) {
                 // Dealer is among the winners
                 honbaSticksCount++;
+                dealerSucceed = true;
             } else {
                 honbaSticksCount = 0;
             }
@@ -125,11 +128,9 @@ public class GameService {
             PlayerScore dealerScore = score.getPlayerIdToScore().get(currentRound.getDealerId());
             if (dealerScore.isTempai() || dealerScore.isRiichi()) {
                 // Keep dealer
-                honbaSticksCount++;
-            } else {
-                // Switch dealer
-                honbaSticksCount = 0;
+                dealerSucceed = true;
             }
+            honbaSticksCount++;
             // Add all riichi on the table to riichi sticks count
             for (PlayerScore s : score.getPlayerIdToScore().values()) {
                 if (s.isRiichi()) {
@@ -138,32 +139,21 @@ public class GameService {
             }
         }
 
-        Wind nextRoundWind = getNextRoundWind(currentRound, seating);
-        Wind lastGameWind = gameData.getLastGameWind();
-        RulesSet.GameEndOptions gameEndOptions = null;
-        if (nextRoundWind == lastGameWind.next()) {
-            // It was the last round in the last wind of the game.
-            // We should check the rules, shoud we continue playing?
-            gameEndOptions = rulesSet.canCompleteGame(game.getCurrentScoreByPlayer(),
-                    currentRound.getDealerId(),
-                    honbaSticksCount > 0);
+        // We should check the rules, shoud we continue playing?
+        RulesSet.GameEndOptions gameEndOptions = rulesSet.shouldCompleteGame(game, dealerSucceed);
+        switch (gameEndOptions) {
+            case CONTINUE:
+                // We need do nothing here if we need to continue
+                break;
+            case END:
+                // Game can end at any point, for example because of bankruptcy of one player
+                return updateGame(completeGame(game, riichiSticksCount, rulesSet), dryRun);
+            case PLAY_NEXT_WIND:
+                throw new NotImplementedException("Play next wind after last wind in the game currently not supported");
         }
 
-        if (gameEndOptions != null) {
-            switch (gameEndOptions) {
-                case END:
-                    return updateGame(completeGame(game), dryRun);
-                case REPEAT_ROUND:
-                    gameData.getRounds().add(Round.start(
-                            currentRound.getDealerId(), currentRound.getWind(), riichiSticksCount, honbaSticksCount));
-                    return updateGame(game, dryRun);
-                case PLAY_NEXT_WIND:
-                    throw new NotImplementedException("Play next wind after last wind in the game currently not supported");
-            }
-        }
-
-        // Game needn't be complete at this point
-        if (honbaSticksCount > 0) {
+        // Game needn't to be complete at this point
+        if (dealerSucceed) {
             // It means that we need to repeat last round
             gameData.getRounds().add(Round.start(
                     currentRound.getDealerId(), currentRound.getWind(), riichiSticksCount, honbaSticksCount));
@@ -172,7 +162,8 @@ public class GameService {
 
         // We need to switch dealer
         Long nextDealerId = getNextDealerId(currentRound, seating);
-        gameData.getRounds().add(Round.start(nextDealerId, nextRoundWind, riichiSticksCount, honbaSticksCount));
+        gameData.getRounds().add(Round.start(
+                nextDealerId, getNextRoundWind(currentRound, seating), riichiSticksCount, honbaSticksCount));
 
         return updateGame(game, dryRun);
     }
@@ -196,38 +187,9 @@ public class GameService {
         return !needSwitchWind ? currentRound.getWind() : currentRound.getWind().next();
     }
 
-    private Game completeGame(Game game) {
-        List<Integer> currentScore = game.getCurrentScore();
-        if (game.getGameData().isWithUma()) {
-            applyUma(currentScore, game.getPlayerToPlace());
-        }
-        applyPenalties(currentScore, game.getPlayerIds(), game.getGameData().getPenalties());
-        game.setFinalScore(currentScore);
+    private Game completeGame(Game game, int riichiSticksCount, RulesSet rulesSet) {
+        game.setFinalScore(rulesSet.calculateFinalScore(game, riichiSticksCount));
         game.setCompleted(true);
         return game;
     }
-
-    private void applyUma(List<Integer> score, BiMap<Integer, Integer> playerToPlace) {
-        List<Integer> uma = Arrays.asList(15000, 5000, -5000, 15000);
-        for (int i = 0; i < score.size(); i++) {
-            score.set(i, score.get(i) + uma.get(playerToPlace.get(i)));
-        }
-    }
-
-    private void applyPenalties(List<Integer> score, List<Long> playerIds, List<Penalty> penalties) {
-        Map<Long, Integer> playerToPos = new HashMap<>();
-        for (int i = 0; i < playerIds.size(); i++) {
-            playerToPos.put(playerIds.get(i), i);
-        }
-        penalties.forEach(penalty -> {
-            int playerPos = playerToPos.get(penalty.getPlayerId());
-            score.set(playerPos, score.get(playerPos) - penalty.getAmount());
-        });
-    }
-
-    private <T> T getLast(List<T> l) {
-        Preconditions.checkArgument(!l.isEmpty(), "List is empty!");
-        return l.get(l.size() - 1);
-    }
-
 }

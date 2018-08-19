@@ -3,7 +3,7 @@ package com.github.mahjong.main.rules.riichi;
 public class RiichiBasicScoreHelper {
 
     public static int getBasicPoints(int han, int fu) {
-        int basic = getBasicScore(han, fu);
+        int basic = getBasicScore(han, fu == 0 ? 30 : fu);
         if (basic <= 2000) {
             return basic;
         }

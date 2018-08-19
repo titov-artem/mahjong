@@ -3,15 +3,15 @@ package com.github.mahjong.main.rules.riichi.ema;
 import com.github.mahjong.common.enums.LangIso639;
 import com.github.mahjong.common.translation.DefaultTranslationMessageSource;
 import com.github.mahjong.common.translation.TranslationMessageSource;
-import com.github.mahjong.main.model.Round;
+import com.github.mahjong.main.model.*;
 import com.github.mahjong.main.rules.Combination;
 import com.github.mahjong.main.rules.RulesSet;
 import com.github.mahjong.main.rules.riichi.RiichiBasicScoreHelper;
 import com.github.mahjong.main.service.model.GameSeating;
-import com.github.mahjong.main.model.PlayerScore;
 import com.github.mahjong.main.service.model.RoundScore;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.BiMap;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -76,10 +76,11 @@ public class RiichiEMARuleSet implements RulesSet {
     }
 
     @Override
-    public void calculateRoundScore(RoundScore roundScore, Round round, GameSeating seating) {
+    public Map<Long, Integer> calculateRoundScore(RoundScore roundScore,
+                                                  Round round,
+                                                  GameSeating seating) {
         if (roundScore.isDraw()) {
-            processDraw(round, roundScore);
-            return;
+            return processDraw(roundScore);
         }
         Preconditions.checkArgument(
                 (roundScore.getLosers().size() == 1 && roundScore.getWinners().size() >= 1) // Ron
@@ -87,14 +88,14 @@ public class RiichiEMARuleSet implements RulesSet {
                 "Unexpected amount of winners and losers"
         );
 
-        Map<Long, Integer> scores = round.getScores();
+        Map<Long, Integer> scores = new HashMap<>();
         roundScore.getPlayerIdToScore().keySet().forEach(playerId -> scores.put(playerId, 0));
         // At first we will pay to winners for combinations only with honba. After we will pay riichi sticks from table
         roundScore.getWinners().forEach(winnerId -> {
             PlayerScore winnerScore = roundScore.getPlayerIdToScore().get(winnerId);
             boolean isDealer = winnerId == round.getDealerId();
             boolean isTsumo = winnerScore.getCombinationCodes().contains(TSUMO.getCode());
-            int basicPoints = getBasicPoints(winnerScore, isDealer);
+            int basicPoints = getBasicPoints(winnerScore);
 
             if (isDealer) {
                 if (isTsumo) {
@@ -168,17 +169,55 @@ public class RiichiEMARuleSet implements RulesSet {
                 .map(seating::getPlayerOn)
                 .get();
         addScore(scores, firstWinnerId, riichiCount * 1000);
+        return scores;
     }
 
     @Override
-    public GameEndOptions canCompleteGame(Map<Long, Integer> scoreByPlayer, Long dealerId, boolean isDealerSucceed) {
+    public GameEndOptions shouldCompleteGame(Game game,
+                                             boolean isDealerSucceed) {
+        if (game.getGameData().getLastRound().getDealerId() != last(game.getPlayerIds())) {
+            // wind not completed
+            return GameEndOptions.CONTINUE;
+        }
+        // Wind completed
         if (isDealerSucceed) {
-            return GameEndOptions.REPEAT_ROUND;
+            return GameEndOptions.CONTINUE;
+        }
+        // Dealer loose
+        Wind lastWind = game.getGameData().getLastGameWind();
+        Wind currentWind = game.getGameData().getLastRound().getWind();
+        if (lastWind != currentWind) {
+            // Not all winds played
+            return GameEndOptions.CONTINUE;
         }
         return GameEndOptions.END;
     }
 
-    private int getBasicPoints(PlayerScore playerScore, boolean isDealer) {
+    @Override
+    public Map<Long, Integer> calculateFinalScore(Game game, int riichiSticksCount) {
+        Map<Long, Integer> playerToScore = game.getCurrentScoreByPlayer();
+        // Add left riichi sticks to 1st place
+        BiMap<Long, Integer> playerToPlace = game.getPlayerToPlace();
+        addScore(playerToScore, playerToPlace.inverse().get(1), riichiSticksCount * 1000);
+        if (game.getGameData().isWithUma()) {
+            applyUma(playerToScore, playerToPlace);
+        }
+        applyPenalties(playerToScore, game.getGameData().getPenalties());
+        return playerToScore;
+    }
+
+    private void applyUma(Map<Long, Integer> playerToScore, BiMap<Long, Integer> playerToPlace) {
+        List<Integer> uma = Arrays.asList(15000, 5000, -5000, -15000);
+        for (Long playerId : new ArrayList<>(playerToScore.keySet())) {
+            addScore(playerToScore, playerId, uma.get(playerToPlace.get(playerId) - 1));
+        }
+    }
+
+    private void applyPenalties(Map<Long, Integer> playerToScore, List<Penalty> penalties) {
+        penalties.forEach(penalty -> addScore(playerToScore, penalty.getPlayerId(), -penalty.getAmount()));
+    }
+
+    private int getBasicPoints(PlayerScore playerScore) {
         Set<RiichiEMACombination> combinations = playerScore.getCombinationCodes().stream()
                 .map(RiichiEMACombination::forCode)
                 .collect(Collectors.toSet());
@@ -191,6 +230,7 @@ public class RiichiEMARuleSet implements RulesSet {
             }
             hanCount += score;
         }
+        Preconditions.checkArgument(playerScore.getDoraCount() >= 0, "Dora count can't be less then 0");
         hanCount += playerScore.getDoraCount();
         if (hanCount >= 13 && hanCount != SCORE_LIMIT) {
             // No kazoe-yakuman
@@ -200,44 +240,47 @@ public class RiichiEMARuleSet implements RulesSet {
             // Yakuman
             hanCount = 13;
         }
+        Preconditions.checkArgument(playerScore.getFuCount() >= 0, "Fu count can't be less then 0");
         return RiichiBasicScoreHelper.getBasicPoints(hanCount, playerScore.getFuCount());
     }
 
     // todo add tests
     @VisibleForTesting
-    protected void processDraw(Round round, RoundScore roundScore) {
+    protected Map<Long, Integer> processDraw(RoundScore roundScore) {
         Preconditions.checkState(roundScore.isDraw());
+        Map<Long, Integer> score = new HashMap<>();
         // Substract 1000 for players with riichi
-        roundScore.getPlayerIdToScore().forEach((playerId, score) -> {
-            if (score.isRiichi()) {
-                round.getScores().put(playerId, -1000);
+        roundScore.getPlayerIdToScore().forEach((playerId, sc) -> {
+            if (sc.isRiichi()) {
+                score.put(playerId, -1000);
             } else {
-                round.getScores().put(playerId, 0);
+                score.put(playerId, 0);
             }
         });
         // Get players in tempai
         Set<Long> playersInTempai = new HashSet<>();
-        roundScore.getPlayerIdToScore().forEach((playerId, score) -> {
-            if (score.isTempai() || score.isRiichi()) {
+        roundScore.getPlayerIdToScore().forEach((playerId, sc) -> {
+            if (sc.isTempai() || sc.isRiichi()) {
                 playersInTempai.add(playerId);
             }
         });
         if (playersInTempai.size() == 4 || playersInTempai.size() == 0) {
             // If all or none in tempai, then we need to pay nothing
-            return;
+            return score;
         }
         // How much player in tempai will receive from others
         int incomeSize = 3000 / playersInTempai.size();
         // How much player without tempai will pay to others
         int outcomeSize = 3000 / (4 - playersInTempai.size());
-        roundScore.getPlayerIdToScore().forEach((playerId, score) -> {
-            int curScore = round.getScores().get(playerId);
+        roundScore.getPlayerIdToScore().forEach((playerId, sc) -> {
+            int curScore = score.get(playerId);
             if (playersInTempai.contains(playerId)) {
-                round.getScores().put(playerId, curScore + incomeSize);
+                score.put(playerId, curScore + incomeSize);
             } else {
-                round.getScores().put(playerId, curScore - outcomeSize);
+                score.put(playerId, curScore - outcomeSize);
             }
         });
+        return score;
     }
 
     private static void addScore(Map<Long, Integer> playerToScore, Long playerId, int scoreDelta) {
@@ -251,5 +294,10 @@ public class RiichiEMARuleSet implements RulesSet {
         Iterator<T> iterator = it.iterator();
         Preconditions.checkArgument(iterator.hasNext(), "Iterable is empty!");
         return iterator.next();
+    }
+
+    private static <T> T last(List<T> col) {
+        Preconditions.checkArgument(!col.isEmpty(), "Iterable is empty!");
+        return col.get(col.size() - 1);
     }
 }

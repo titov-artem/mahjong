@@ -1,11 +1,14 @@
 package com.github.mahjong.main.rules;
 
+// todo it is not good to mix visualization options with other here. Think how to extract them...
+
 /**
- * Combination represent single mahjong combination. There are can be only ine combination with same code in player's
- * hand.
+ * Combination represent single mahjong combination. There are can be only one combination with
+ * same code in player's hand.
  * <p>
  * All combinations from one {@link RulesSet} will be splitted on groups according to {@link #getGroup()}
- * and shown on UI starting from lowest group number to highest. Each group will be separated from another.
+ * and shown on UI starting from lowest group number to highest. Each group will be separated from
+ * another.
  * <p>
  * Inside single group combinations will be sorted according to {@link #getOrder()}
  */

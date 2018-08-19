@@ -1,24 +1,13 @@
 package com.github.mahjong.main.rules.riichi.ema
 
+import com.github.mahjong.main.model.PlayerScore
 import com.github.mahjong.main.model.Round
 import com.github.mahjong.main.model.Wind
 import com.github.mahjong.main.service.model.GameSeating
-import com.github.mahjong.main.model.PlayerScore
 import com.github.mahjong.main.service.model.RoundScore
 import spock.lang.Specification
 
-import static com.github.mahjong.main.rules.riichi.ema.RiichiEMACombination.CHIITOITSU
-import static com.github.mahjong.main.rules.riichi.ema.RiichiEMACombination.CHINITSU
-import static com.github.mahjong.main.rules.riichi.ema.RiichiEMACombination.DAISANGEN
-import static com.github.mahjong.main.rules.riichi.ema.RiichiEMACombination.HONROUTOU
-import static com.github.mahjong.main.rules.riichi.ema.RiichiEMACombination.IPPATSU
-import static com.github.mahjong.main.rules.riichi.ema.RiichiEMACombination.JUNCHAN
-import static com.github.mahjong.main.rules.riichi.ema.RiichiEMACombination.PINFU
-import static com.github.mahjong.main.rules.riichi.ema.RiichiEMACombination.RIICHI
-import static com.github.mahjong.main.rules.riichi.ema.RiichiEMACombination.SANSHOKU
-import static com.github.mahjong.main.rules.riichi.ema.RiichiEMACombination.TANYAO
-import static com.github.mahjong.main.rules.riichi.ema.RiichiEMACombination.TSUMO
-import static com.github.mahjong.main.rules.riichi.ema.RiichiEMACombination.YAKUHAI_1
+import static com.github.mahjong.main.rules.riichi.ema.RiichiEMACombination.*
 
 class RiichiEMARuleSetTsumoProcessingTest extends Specification {
 
@@ -40,10 +29,10 @@ class RiichiEMARuleSetTsumoProcessingTest extends Specification {
         def seating = new GameSeating([1L, 2L, 3L, 4L])
 
         when:
-        ruleSet.calculateRoundScore(score, round, seating)
+        def resultScores = ruleSet.calculateRoundScore(score, round, seating)
 
         then:
-        round.scores == new HashMap([
+        resultScores == new HashMap([
                 1L: -1600,
                 2L: 3200,
                 3L: -800,
@@ -67,10 +56,10 @@ class RiichiEMARuleSetTsumoProcessingTest extends Specification {
         def seating = new GameSeating([1L, 2L, 3L, 4L])
 
         when:
-        ruleSet.calculateRoundScore(score, round, seating)
+        def resultScores = ruleSet.calculateRoundScore(score, round, seating)
 
         then:
-        round.scores == new HashMap([
+        resultScores == new HashMap([
                 1L: -2000,
                 2L: 4000,
                 3L: -1000,
@@ -94,10 +83,10 @@ class RiichiEMARuleSetTsumoProcessingTest extends Specification {
         def seating = new GameSeating([1L, 2L, 3L, 4L])
 
         when:
-        ruleSet.calculateRoundScore(score, round, seating)
+        def resultScores = ruleSet.calculateRoundScore(score, round, seating)
 
         then:
-        round.scores == new HashMap([
+        resultScores == new HashMap([
                 1L: -3900,
                 2L: 7900,
                 3L: -2000,
@@ -121,10 +110,10 @@ class RiichiEMARuleSetTsumoProcessingTest extends Specification {
         def seating = new GameSeating([1L, 2L, 3L, 4L])
 
         when:
-        ruleSet.calculateRoundScore(score, round, seating)
+        def resultScores = ruleSet.calculateRoundScore(score, round, seating)
 
         then:
-        round.scores == new HashMap([
+        resultScores == new HashMap([
                 1L: -4000,
                 2L: 8000,
                 3L: -2000,
@@ -148,10 +137,10 @@ class RiichiEMARuleSetTsumoProcessingTest extends Specification {
         def seating = new GameSeating([1L, 2L, 3L, 4L])
 
         when:
-        ruleSet.calculateRoundScore(score, round, seating)
+        def resultScores = ruleSet.calculateRoundScore(score, round, seating)
 
         then:
-        round.scores == new HashMap([
+        resultScores == new HashMap([
                 1L: -6000,
                 2L: 12000,
                 3L: -3000,
@@ -175,10 +164,10 @@ class RiichiEMARuleSetTsumoProcessingTest extends Specification {
         def seating = new GameSeating([1L, 2L, 3L, 4L])
 
         when:
-        ruleSet.calculateRoundScore(score, round, seating)
+        def resultScores = ruleSet.calculateRoundScore(score, round, seating)
 
         then:
-        round.scores == new HashMap([
+        resultScores == new HashMap([
                 1L: -8000,
                 2L: 16000,
                 3L: -4000,
@@ -203,10 +192,10 @@ class RiichiEMARuleSetTsumoProcessingTest extends Specification {
         def seating = new GameSeating([1L, 2L, 3L, 4L])
 
         when:
-        ruleSet.calculateRoundScore(score, round, seating)
+        def resultScores = ruleSet.calculateRoundScore(score, round, seating)
 
         then:
-        round.scores == new HashMap([
+        resultScores == new HashMap([
                 1L: -12000,
                 2L: 24000,
                 3L: -6000,
@@ -230,10 +219,10 @@ class RiichiEMARuleSetTsumoProcessingTest extends Specification {
         def seating = new GameSeating([1L, 2L, 3L, 4L])
 
         when:
-        ruleSet.calculateRoundScore(score, round, seating)
+        def resultScores = ruleSet.calculateRoundScore(score, round, seating)
 
         then:
-        round.scores == new HashMap([
+        resultScores == new HashMap([
                 1L: -16000,
                 2L: 32000,
                 3L: -8000,
@@ -257,10 +246,10 @@ class RiichiEMARuleSetTsumoProcessingTest extends Specification {
         def seating = new GameSeating([1L, 2L, 3L, 4L])
 
         when:
-        ruleSet.calculateRoundScore(score, round, seating)
+        def resultScores = ruleSet.calculateRoundScore(score, round, seating)
 
         then:
-        round.scores == new HashMap([
+        resultScores == new HashMap([
                 1L: -4900,
                 2L: 8900,
                 3L: -2000,
@@ -284,10 +273,10 @@ class RiichiEMARuleSetTsumoProcessingTest extends Specification {
         def seating = new GameSeating([1L, 2L, 3L, 4L])
 
         when:
-        ruleSet.calculateRoundScore(score, round, seating)
+        def resultScores = ruleSet.calculateRoundScore(score, round, seating)
 
         then:
-        round.scores == new HashMap([
+        resultScores == new HashMap([
                 1L: 12700,
                 2L: -4900,
                 3L: -3900,
@@ -312,10 +301,10 @@ class RiichiEMARuleSetTsumoProcessingTest extends Specification {
         def seating = new GameSeating([1L, 2L, 3L, 4L])
 
         when:
-        ruleSet.calculateRoundScore(score, round, seating)
+        def resultScores = ruleSet.calculateRoundScore(score, round, seating)
 
         then:
-        round.scores == new HashMap([
+        resultScores == new HashMap([
                 1L: 14700,
                 2L: -4900,
                 3L: -3900,
@@ -340,10 +329,10 @@ class RiichiEMARuleSetTsumoProcessingTest extends Specification {
         def seating = new GameSeating([1L, 2L, 3L, 4L])
 
         when:
-        ruleSet.calculateRoundScore(score, round, seating)
+        def resultScores = ruleSet.calculateRoundScore(score, round, seating)
 
         then:
-        round.scores == new HashMap([
+        resultScores == new HashMap([
                 1L: 13000,
                 2L: -5000,
                 3L: -4000,
